@@ -11,7 +11,7 @@ type File = {
     }
 }
 
-type DirectoryFiles = {
+type FolderFiles = {
     files: File[]
     id: string
 }
@@ -21,14 +21,14 @@ export interface InternalFile extends File {
 }
 
 type RootProps = {
-    defaultFiles: DirectoryFiles,
-    updatedFiles: DirectoryFiles|null
+    defaultFiles: FolderFiles,
+    updatedFiles: FolderFiles|null
     children: ReactNode|ReactNode[]
 }
 
 const convertToInternalFiles = (files: File[]) => {
     return files.map((file) => {
-        if (file.type !== "directory") {
+        if (file.type !== "folder") {
             return file
         }
 
@@ -66,10 +66,10 @@ const Root = ({defaultFiles, updatedFiles, children}: RootProps) => {
     useEffect(() => {
         if (updatedFiles && updatedFiles.files.length > 0) {
             setFiles((oldFiles) => oldFiles.map((file) => {
-                const parentDirectory = searchTree(file, updatedFiles.id)
+                const parentFolder = searchTree(file, updatedFiles.id)
 
-                if (parentDirectory)  {
-                    parentDirectory.children = convertToInternalFiles(updatedFiles.files)
+                if (parentFolder)  {
+                    parentFolder.children = convertToInternalFiles(updatedFiles.files)
                 }
                 
                 return file
@@ -77,9 +77,9 @@ const Root = ({defaultFiles, updatedFiles, children}: RootProps) => {
         }
     }, [updatedFiles, setFiles])
 
-    const setCurrent = (updatedFiles: DirectoryFiles|null, defaultDirectory: DirectoryFiles) => {
+    const setCurrent = (updatedFiles: FolderFiles|null, defaultFolder: FolderFiles) => {
         if (!updatedFiles) {
-            return defaultDirectory.id
+            return defaultFolder.id
         }
 
         return updatedFiles.id

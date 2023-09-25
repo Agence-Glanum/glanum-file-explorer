@@ -1,6 +1,6 @@
-import { ComponentMeta, ComponentStory } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react";
 import { InternalFile, Root as RootComponent } from "./root";
-import { TreeExplorer } from "../tree-explorer/tree-explorer";
+import * as TreeExplorer from "../tree-explorer/tree-explorer";
 import { useState } from "react";
 import { FolderExplorer } from "../folder-explorer/folder-explorer";
 
@@ -8,10 +8,10 @@ import { FolderExplorer } from "../folder-explorer/folder-explorer";
 export default {
   title: "Root",
   component: RootComponent,
-} as ComponentMeta<typeof RootComponent>;
+} as Meta<typeof RootComponent>;
 
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
-const Template: ComponentStory<typeof RootComponent> = () => { 
+const Template: StoryFn<typeof RootComponent> = () => { 
   const [newFiles, setNewFiles] = useState(null)
 
   const data = (file: InternalFile) => {
@@ -26,7 +26,7 @@ const Template: ComponentStory<typeof RootComponent> = () => {
           {
             id: "fjdozjf",
             name: "dir",
-            type: "directory"
+            type: "folder"
           }
         ],
         id: "fzfe"
@@ -39,7 +39,7 @@ const Template: ComponentStory<typeof RootComponent> = () => {
           {
             id: "jhjpljhp",
             name: "Dir 2",
-            type: "directory"
+            type: "folder"
           },
         ],
         id: "fjdozjf"
@@ -65,14 +65,18 @@ const Template: ComponentStory<typeof RootComponent> = () => {
       defaultFiles={{files: [{
         id: "fzfe",
         name: "Test",
-        type: "directory"
+        type: "folder"
       }], id: "mmmm"}}
       updatedFiles={newFiles}
       // updatedFiles={null}
     >
       <div className="flex">
         <div>
-          <TreeExplorer onClickedDirectory={(file) => data(file)} />
+          <TreeExplorer.Root>
+              <TreeExplorer.Level>
+                <TreeExplorer.Item onClick={} />
+              </TreeExplorer.Level>
+          </TreeExplorer.Root>
         </div>
         <div className="pl-6">
           <FolderExplorer onClickedDirectory={(file) => data(file)} />

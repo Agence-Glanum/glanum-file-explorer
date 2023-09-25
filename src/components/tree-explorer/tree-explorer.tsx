@@ -1,22 +1,51 @@
-import { useContext } from "react";
-import { InternalFile, RootContext } from "../root/root";
+import { ReactNode, createContext, useContext, useMemo } from "react";
+import { InternalFile } from "../root/root";
+import { useTreeExplorer } from "./use-tree-explorer";
 
-const Level = ({files, onClick}) => {
+const RootContext = createContext<{folders: InternalFile[]}>({folders: []})
+
+type RootProps = {
+    children: ReactNode
+}
+
+const Root = ({children}: RootProps) => {
+    const { folders } = useTreeExplorer()
+
+    return (
+        <RootContext.Provider value={{folders}}>
+            {children}
+        </RootContext.Provider>
+    )
+}
+
+Root.displayName = "TreeExplorerRoot"
+
+type LevelProps = {
+    folders?: InternalFile[]
+    children: ReactNode
+}
+
+const Level = ({folders, children}: LevelProps) => {
+    const root = useContext(RootContext)
+
+    const items = useMemo(() => {
+        if (folders) {
+            return folders
+        }
+
+        return root.folders
+    }, [root.folders])
+
     return (
         <>
-            {files.filter((file) => file.type === "directory").map((file) => (
+            {items.map((folder) => (
                 <>
-                    <div
-                        key={file.id}
-                        className="flex mb-2 py-1 px-2 border w-fit rounded cursor-pointer"
-                        onClick={() => onClick(file)}
-                    >
-                        <span className="mr-2">{file.name}</span>
-                        {file.type === "directory" ? <span>{">"}</span>: null}
-                    </div>
-                    {file.type === "directory" && file.children.length > 0 ? (
+                    {children}
+                    {folder.type === "folder" && folder.children && folder.children.length > 0 ? (
                         <div className="ml-6">
-                            <Level files={file.children} onClick={onClick} />
+                            <Level folders={folder.children}>
+                                {children}
+                            </Level>
                         </div>
                     ): null}
                 </>
@@ -25,20 +54,26 @@ const Level = ({files, onClick}) => {
     )
 }
 
-const TreeExplorer = ({onClickedDirectory}: {onClickedDirectory: (file: InternalFile) => void}) => {
-    const root = useContext(RootContext)
+Level.displayName = "TreeExplorerLevel"
 
-    const onClick = (file: InternalFile) => {
-        onClickedDirectory && onClickedDirectory(file)
-    }
+type ItemProps = {
+    folder: InternalFile
+    onClick: (file: InternalFile) => void
+}
 
+const Item = ({onClick}: ItemProps) => {
     return (
-        <>
-            <Level files={root.files}  onClick={onClick}/>
-        </>
+        <div
+            key={folder.id}
+            className="flex mb-2 py-1 px-2 border w-fit rounded cursor-pointer"
+            onClick={() => onClick(folder)}
+        >
+            <span className="mr-2">{folder.name}</span>
+            {folder.type === "folder" ? <span>{">"}</span>: null}
+        </div>
     )
 }
 
-TreeExplorer.displayName = "TreeExplorer"
+Item.displayName = "TreeExplorerLevelItem"
 
-export { TreeExplorer }
+export { Root, Level, Item }
