@@ -1,37 +1,38 @@
-import { useContext, useMemo } from "react"
-import { InternalFile, RootContext, searchTree } from "../root/root"
+import { ReactNode } from "react";
+import { Slot } from '@radix-ui/react-slot';
+import { cn } from "../../utils/cn";
 
-const FolderExplorer = ({onClickedDirectory}: {onClickedDirectory: (file: InternalFile) => void}) => {
-    const root = useContext(RootContext)
+type RootProps = {
+    children: ReactNode|ReactNode[]
+}
 
-    const folder = useMemo<InternalFile|null>(() => {
-        let folder = null
-
-        root.files.some((file) => {
-            folder = searchTree(file, root.current)
-
-            return folder !== null
-        })
-        
-        return folder
-    }, [root.current])
-
-    const onClick = (file: InternalFile) => {
-        onClickedDirectory && onClickedDirectory(file)
-    }
+const Root = ({children}: RootProps) => {
 
     return (
-        <div className="grid grid-cols-4 gap-4">
-            {folder?.children?.map((file) => (
-                <div className="border p-4" key={file.id} onClick={() => onClick(file)}>
-                    <span>{file.name}</span>
-                    <span>{file.type}</span>
-                </div>
-            ))}
-        </div>
+        {children}
     )
 }
 
-FolderExplorer.displayName = "FolderExplorer"
+Root.displayName = "TreeExplorerRoot"
 
-export { FolderExplorer }
+interface ItemProps extends React.HTMLAttributes<HTMLDivElement> {
+    asChild?: boolean
+    depth?: number
+}
+
+const Item = ({ depth = 0, className, asChild = false,...props }: ItemProps) => {
+    const Comp = asChild ? Slot : 'div';
+
+    return <Comp
+        className={cn(
+            "flex mb-2 py-1 px-2 border w-fit rounded cursor-pointer",
+            className
+        )}
+        style={{marginLeft: 15 * depth}}
+        {...props}
+     />;
+}
+
+Item.displayName = "TreeExplorerItem"
+
+export { Root, Item }
