@@ -1,5 +1,5 @@
 import { produce } from "immer"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 type File = {
     id: string
@@ -60,20 +60,30 @@ export function searchTree(file: InternalFile, fileId: string): InternalFile|nul
     return null;
 }
 
-type TreeInternalFile = InternalFile & {depth: number|undefined}
+type TreeInternalFile = InternalFile & {depth: number|undefined, parent: Array<string>}
 
-const traverse = (folder: Array<InternalFile>, depth?: undefined|number): Array<TreeInternalFile> => {
+const traverse = (
+    folder: Array<InternalFile>, 
+    depth?: undefined|number, 
+    parent?: undefined|Array<string>
+): Array<TreeInternalFile> => {
 
-    if (typeof depth == 'number'){
+    if (typeof depth === 'number'){
         depth++;
     } else {
         depth = 0;
     }
 
+    if (Array.isArray(parent) && folder.length !== 0){
+        parent.push(folder[0].meta?.parentDirId);
+    } else {
+        parent = [];
+    }
+
     return folder.reduce<Array<TreeInternalFile>>(function(result,next){
-        result.push({...next, depth});
+        result.push({...next, depth, parent: [...parent]});
         if(next.children){
-          result = result.concat(traverse(next.children.filter((file) => file.type === "folder"), depth));  
+          result = result.concat(traverse(next.children.filter((file) => file.type === "folder"), depth, parent));  
         }
         return result;
       },[]);
@@ -84,6 +94,7 @@ export function useFileExplorer({defaultFiles}: Props) {
 
     const [files, setFiles] = useState(convertToInternalFiles(defaultFiles.files))
     const [openFolders, setOpenFolders] = useState<Array<string>>([])
+    const [currentFolderId, setCurrentFolderId] = useState<string|null>(null)
 
     const folders = useMemo(() => {
         return files
@@ -92,43 +103,66 @@ export function useFileExplorer({defaultFiles}: Props) {
             .flat()
     }, [files])
 
-    const onFolderClick = (folder: InternalFile) => {
+    const onFolderOpen = useCallback((folder: TreeInternalFile) => {
         setOpenFolders(produce((oldOpenFolders) => {
-            var index = oldOpenFolders.indexOf(folder.id);
+            var index = oldOpenFolders.indexOf(folder.id)
             if (index === -1) {
-                oldOpenFolders.push(folder.id);
+                oldOpenFolders.push(folder.id)
             } else {
-                oldOpenFolders.splice(index, 1);
+                oldOpenFolders.splice(index, 1)
             }
         }))
-    }
+        setCurrentFolderId(folder.id)
+    }, [])
 
-    const update = (updatedFiles: FolderFiles) => {
+    const onFolderClick = useCallback((folder: TreeInternalFile) => {
+        setCurrentFolderId(folder.id)
+    }, [])
+
+    const update = useCallback((updatedFiles: FolderFiles) => {
         if (updatedFiles && updatedFiles.files.length > 0) {
-            setFiles(produce((oldFiles) => {
-                oldFiles.forEach((file) => {
+            setFiles(produce((draft) => {
+                draft.forEach((file) => {
                     const parentFolder = searchTree(file, updatedFiles.id)
 
-                    if (parentFolder) {
-                        setOpenFolders(produce((oldOpenFolders) => {
-                            oldOpenFolders.push(parentFolder.id)
-                        }))
+                    if (parentFolder && parentFolder.children?.length === 0) {
                         parentFolder.children = convertToInternalFiles(updatedFiles.files)
                     }
                 })}
             ))
         }
-    }
+    }, [setOpenFolders])
 
-    const isFolderOpen = (folder: TreeInternalFile) => {
-        return openFolders.includes(folder.meta?.parentDirId) || (folder.depth ?? 0) === 0
-    }
+    const isFolderVisible = useCallback((folder: TreeInternalFile) => {
+        return  folder.parent.every(id => openFolders.includes(id)) || (folder.depth ?? 0) === 0
+    }, [openFolders])
+
+    const isFolderOpen = useCallback((folder: TreeInternalFile) => {
+        return openFolders.includes(folder.id)
+    }, [openFolders])
+
+    const getCurrentFolderContent = useCallback(() => {
+        let currentFolder: InternalFile|null = null
+
+        files.forEach((file) => {
+            const parentFolder = searchTree(file, currentFolderId)
+
+            if (parentFolder) {
+                currentFolder = parentFolder
+            }
+        })
+
+        return currentFolder
+    }, [files, currentFolderId])
 
     return  {
         files,
         folders,
-        onFolderClick,
+        onFolderOpen,
+        isFolderVisible,
         isFolderOpen,
+        onFolderClick,
+        getCurrentFolderContent,
         update
     }
 }

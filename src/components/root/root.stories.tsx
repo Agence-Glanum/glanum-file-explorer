@@ -1,7 +1,7 @@
 import { Meta, StoryFn } from "@storybook/react";
 import { InternalFile } from "./root";
 import * as FolderExplorer from "../folder-explorer/folder-explorer";
-import { useState } from "react";
+import * as FolderContentExplorer from "../folder-content-explorer/folder-content-explorer";
 import { useFileExplorer } from "./use-file-explorer";
 import clsx from "clsx";
 
@@ -14,16 +14,30 @@ export default {
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
 const Template: StoryFn<typeof FolderExplorer.Root> = () => { 
 
-  const { folders, onFolderClick, update, isFolderOpen } = useFileExplorer({
+  const {
+    folders,
+    onFolderOpen,
+    onFolderClick,
+    update,
+    isFolderOpen,
+    isFolderVisible,
+    getCurrentFolderContent
+  } = useFileExplorer({
       defaultFiles: {files: [{
         id: "00001",
         name: "00001",
-        type: "folder"
+        type: "folder",
+        meta: {
+          parentDirId: "00000"
+        }
       },
       {
         id: "00002",
         name: "00002",
-        type: "folder"
+        type: "folder",
+        meta: {
+          parentDirId: "00000"
+        }
       }], 
       id: "00000"
     }
@@ -36,12 +50,18 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
           {
             id: "00011",
             name: "00011",
-            type: "file"
+            type: "file",
+            meta: {
+              parentDirId: "00001"
+            }
           },
           {
             id: "00021",
             name: "00021",
-            type: "folder"
+            type: "folder",
+            meta: {
+              parentDirId: "00001"
+            }
           }
         ],
         id: "00001"
@@ -54,17 +74,26 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
           {
             id: "00121",
             name: "00121",
-            type: "folder"
+            type: "folder",
+            meta: {
+              parentDirId: "00021"
+            }
           },
           {
             id: "00221",
             name: "00221",
-            type: "folder"
+            type: "folder",
+            meta: {
+              parentDirId: "00021"
+            }
           },
           {
             id: "00321",
             name: "00321",
-            type: "folder"
+            type: "folder",
+            meta: {
+              parentDirId: "00021"
+            }
           },
         ],
         id: "00021"
@@ -77,7 +106,10 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
           {
             id: "01321",
             name: "01321",
-            type: "folder"
+            type: "folder",
+            meta: {
+              parentDirId: "00321"
+            }
           },
         ],
         id: "00321"
@@ -90,7 +122,10 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
           {
             id: "01121",
             name: "01121",
-            type: "file"
+            type: "file",
+            meta: {
+              parentDirId: "00121"
+            }
           },
         ],
         id: "00121"
@@ -103,7 +138,10 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
           {
             id: "00012",
             name: "00012",
-            type: "folder"
+            type: "folder",
+            meta: {
+              parentDirId: "00002"
+            }
           },
         ],
         id: "00002"
@@ -116,16 +154,31 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
       <div>
           {folders.map((folder) => (
             <FolderExplorer.Item
-              onClick={() => {
+              onDoubleClick={() => {
                 data(folder)
+                onFolderOpen(folder)
+              }}
+              onClick={() => {
                 onFolderClick(folder)
               }}
               depth={folder.depth}
-              className={clsx(!isFolderOpen(folder) && "hidden")}
+              className={clsx(!isFolderVisible(folder) && "hidden")}
             >
-              {folder.name} {folder.type === "folder" ? <span>{">"}</span>: null}
+              {folder.name} 
+              {folder.type === "folder" ? (
+                <span>
+                  {isFolderOpen(folder) ? "v" : ">"}
+                </span>
+              ): null}
             </FolderExplorer.Item>
           ))}
+      </div>
+      <div className="grid grid-cols-4 gap-4">
+        {getCurrentFolderContent()?.children?.map((file) => (
+          <FolderContentExplorer.Item>
+              {file.name} {file.type}
+          </FolderContentExplorer.Item>
+        )) }
       </div>
     </div>
 )};
