@@ -1,5 +1,5 @@
 import { produce } from "immer"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 
 type File = {
     id: string
@@ -75,19 +75,19 @@ const traverse = (
     }
 
     if (Array.isArray(parent) && folder.length !== 0){
-        parent.push(folder[0].meta?.parentDirId);
+        parent.push(folder[0].meta?.parentDirId ?? "");
     } else {
         parent = [];
     }
 
     return folder.reduce<Array<TreeInternalFile>>(function(result,next){
-        result.push({...next, depth, parent: [...parent]});
+        result.push({...next, depth, parent: [...parent as Array<string>]});
         if(next.children){
           result = result.concat(traverse(next.children.filter((file) => file.type === "folder"), depth, parent));  
         }
         return result;
       },[]);
-};
+}
 
 
 export function useFileExplorer({defaultFiles}: Props) {
@@ -96,24 +96,68 @@ export function useFileExplorer({defaultFiles}: Props) {
     const [openFolders, setOpenFolders] = useState<Array<string>>([])
     const [currentFolderId, setCurrentFolderId] = useState<string|null>(null)
 
+    const isFolderVisible = useCallback((folder: TreeInternalFile) => {
+        return  folder.parent.every(id => openFolders.includes(id)) || (folder.depth ?? 0) === 0
+    }, [openFolders])
+
     const folders = useMemo(() => {
         return files
             .filter((file) => file.type === "folder")
             .map((file) => traverse([file]))
             .flat()
+            .filter((folder) => isFolderVisible(folder))
+    }, [files, openFolders])
+
+    const searchInFiles = useCallback((search: string, localFiles?: Array<InternalFile>): InternalFile|null => {
+        const searchable = localFiles ? localFiles : files
+
+        let file: InternalFile|null = null
+
+        searchable.some((tree) => {
+            const found = searchTree(tree, search)
+
+            if (found) {
+                file = found
+                return true
+            }
+            return false
+        })
+
+        return file
     }, [files])
 
-    const openFolder = useCallback((folder: InternalFile) => {
-        setOpenFolders(produce((oldOpenFolders) => {
-            var index = oldOpenFolders.indexOf(folder.id)
+    const openFolderFromTree = useCallback((folder: TreeInternalFile) => {
+        setOpenFolders(produce((draft) => {
+            const index = draft.indexOf(folder.id)
             if (index === -1) {
-                oldOpenFolders.push(folder.id)
+                draft.push(folder.id)
             } else {
-                oldOpenFolders.splice(index, 1)
+                draft.splice(index, 1)
             }
         }))
         setCurrentFolderId(folder.id)
     }, [])
+
+    const openFolder = useCallback((folder: InternalFile) => {
+        setOpenFolders(produce((draft) => {
+            const index = draft.indexOf(folder.id)
+
+            if(index === -1) {
+                draft.push(folder.id)
+            }
+
+            const parentFolder = searchInFiles(folder.meta?.parentDirId ?? "")
+
+            if (parentFolder) {
+                const index = draft.indexOf(parentFolder.id)
+
+                if(index === -1) {
+                    draft.push(parentFolder.id)
+                }
+            }
+        }))
+        setCurrentFolderId(folder.id)
+    }, [files])
 
     const clickFolder = useCallback((folder: TreeInternalFile) => {
         setCurrentFolderId(folder.id)
@@ -122,20 +166,14 @@ export function useFileExplorer({defaultFiles}: Props) {
     const update = useCallback((updatedFiles: FolderFiles) => {
         if (updatedFiles && updatedFiles.files.length > 0) {
             setFiles(produce((draft) => {
-                draft.forEach((file) => {
-                    const parentFolder = searchTree(file, updatedFiles.id)
+                const parentFolder = searchInFiles(updatedFiles.id, draft)
 
-                    if (parentFolder && parentFolder.children?.length === 0) {
-                        parentFolder.children = convertToInternalFiles(updatedFiles.files)
-                    }
-                })}
-            ))
+                if (parentFolder && parentFolder.children?.length === 0) {
+                    parentFolder.children = convertToInternalFiles(updatedFiles.files)
+                }
+            }))
         }
     }, [setOpenFolders])
-
-    const isFolderVisible = useCallback((folder: TreeInternalFile) => {
-        return  folder.parent.every(id => openFolders.includes(id)) || (folder.depth ?? 0) === 0
-    }, [openFolders])
 
     const isFolderOpen = useCallback((folder: TreeInternalFile) => {
         return openFolders.includes(folder.id)
@@ -146,17 +184,7 @@ export function useFileExplorer({defaultFiles}: Props) {
             return null
         }
 
-        let currentFolder: InternalFile|null = null
-
-        files.forEach((file) => {
-            const parentFolder = searchTree(file, currentFolderId)
-
-            if (parentFolder) {
-                currentFolder = parentFolder
-            }
-        })
-
-        return currentFolder
+        return searchInFiles(currentFolderId)
     }, [files, currentFolderId])
 
     const getCurrentFolderContent = useCallback((): Array<InternalFile> => {
@@ -173,6 +201,7 @@ export function useFileExplorer({defaultFiles}: Props) {
         files,
         folders,
         openFolder,
+        openFolderFromTree,
         isFolderVisible,
         isFolderOpen,
         clickFolder,

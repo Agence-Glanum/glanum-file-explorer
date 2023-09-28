@@ -1,9 +1,8 @@
 import { Meta, StoryFn } from "@storybook/react";
-import { InternalFile } from "./root";
+import { InternalFile } from "./use-file-explorer";
 import * as FolderExplorer from "../folder-explorer/folder-explorer";
 import * as FolderContentExplorer from "../folder-content-explorer/folder-content-explorer";
 import { useFileExplorer } from "./use-file-explorer";
-import clsx from "clsx";
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
@@ -17,10 +16,10 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
   const {
     folders,
     openFolder,
+    openFolderFromTree,
     clickFolder,
     update,
     isFolderOpen,
-    isFolderVisible,
     getCurrentFolder,
     getCurrentFolderContent,
   } = useFileExplorer({
@@ -201,18 +200,18 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
 
   return (
     <div className="flex">
-      <div>
-          {folders.map((folder) => (
+      <FolderExplorer.Root>
+          {folders.map((folder) =>(
             <FolderExplorer.Item
+              key={folder.id}
               onDoubleClick={() => {
                 data(folder)
-                openFolder(folder)
+                openFolderFromTree(folder)
               }}
               onClick={() => {
                 clickFolder(folder)
               }}
-              depth={folder.depth}
-              className={clsx(!isFolderVisible(folder) && "hidden")}
+              style={{left: 15 * (folder.depth ?? 0)}}
             >
               {folder.name} 
               {folder.type === "folder" ? (
@@ -222,12 +221,12 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
               ): null}
             </FolderExplorer.Item>
           ))}
-      </div>
+      </FolderExplorer.Root>
       <div>
         <h3>{ getCurrentFolder()?.name }</h3>
         <div className="grid grid-cols-4 gap-4">
           {getCurrentFolderContent().map((file) => (
-            <FolderContentExplorer.Item onDoubleClick={() => {
+            <FolderContentExplorer.Item key={file.id} onDoubleClick={() => {
               if (file.type === "folder") {
                 data(file)
                 openFolder(file)

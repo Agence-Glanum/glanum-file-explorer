@@ -5,7 +5,7 @@ interface ItemProps extends React.HTMLAttributes<HTMLDivElement> {
     asChild?: boolean
 }
 
-const Item = ({ className, asChild = false,...props }: ItemProps) => {
+const Item = ({ className, asChild = false, ...props }: ItemProps) => {
     const Comp = asChild ? Slot : 'div';
 
     return <Comp
