@@ -10,7 +10,7 @@ const Item = ({ className, asChild = false,...props }: ItemProps) => {
 
     return <Comp
         className={cn(
-            "border p-4",
+            "border p-4 cursor-pointer",
             className
         )}
         {...props}

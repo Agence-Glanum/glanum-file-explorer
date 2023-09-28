@@ -103,7 +103,7 @@ export function useFileExplorer({defaultFiles}: Props) {
             .flat()
     }, [files])
 
-    const onFolderOpen = useCallback((folder: TreeInternalFile) => {
+    const openFolder = useCallback((folder: InternalFile) => {
         setOpenFolders(produce((oldOpenFolders) => {
             var index = oldOpenFolders.indexOf(folder.id)
             if (index === -1) {
@@ -115,7 +115,7 @@ export function useFileExplorer({defaultFiles}: Props) {
         setCurrentFolderId(folder.id)
     }, [])
 
-    const onFolderClick = useCallback((folder: TreeInternalFile) => {
+    const clickFolder = useCallback((folder: TreeInternalFile) => {
         setCurrentFolderId(folder.id)
     }, [])
 
@@ -141,7 +141,11 @@ export function useFileExplorer({defaultFiles}: Props) {
         return openFolders.includes(folder.id)
     }, [openFolders])
 
-    const getCurrentFolderContent = useCallback(() => {
+    const getCurrentFolder = useCallback((): InternalFile|null => {
+        if (!currentFolderId) {
+            return null
+        }
+
         let currentFolder: InternalFile|null = null
 
         files.forEach((file) => {
@@ -155,13 +159,24 @@ export function useFileExplorer({defaultFiles}: Props) {
         return currentFolder
     }, [files, currentFolderId])
 
+    const getCurrentFolderContent = useCallback((): Array<InternalFile> => {
+        const currentFolder = getCurrentFolder()
+
+        if (!currentFolder) {
+            return []
+        }
+
+        return (currentFolder as InternalFile).children ?? [] 
+    }, [files, currentFolderId])
+
     return  {
         files,
         folders,
-        onFolderOpen,
+        openFolder,
         isFolderVisible,
         isFolderOpen,
-        onFolderClick,
+        clickFolder,
+        getCurrentFolder,
         getCurrentFolderContent,
         update
     }

@@ -16,12 +16,13 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
 
   const {
     folders,
-    onFolderOpen,
-    onFolderClick,
+    openFolder,
+    clickFolder,
     update,
     isFolderOpen,
     isFolderVisible,
-    getCurrentFolderContent
+    getCurrentFolder,
+    getCurrentFolderContent,
   } = useFileExplorer({
       defaultFiles: {files: [{
         id: "00001",
@@ -34,6 +35,55 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
       {
         id: "00002",
         name: "00002",
+        type: "folder",
+        meta: {
+          parentDirId: "00000"
+        }
+      },{
+        id: "00003",
+        name: "00003",
+        type: "folder",
+        meta: {
+          parentDirId: "00000"
+        }
+      },{
+        id: "00004",
+        name: "00004",
+        type: "folder",
+        meta: {
+          parentDirId: "00000"
+        }
+      },{
+        id: "00005",
+        name: "00005",
+        type: "folder",
+        meta: {
+          parentDirId: "00000"
+        }
+      },{
+        id: "00006",
+        name: "00006",
+        type: "folder",
+        meta: {
+          parentDirId: "00000"
+        }
+      },{
+        id: "00007",
+        name: "00007",
+        type: "folder",
+        meta: {
+          parentDirId: "00000"
+        }
+      },{
+        id: "00008",
+        name: "00008",
+        type: "folder",
+        meta: {
+          parentDirId: "00000"
+        }
+      },{
+        id: "00009",
+        name: "00009",
         type: "folder",
         meta: {
           parentDirId: "00000"
@@ -156,10 +206,10 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
             <FolderExplorer.Item
               onDoubleClick={() => {
                 data(folder)
-                onFolderOpen(folder)
+                openFolder(folder)
               }}
               onClick={() => {
-                onFolderClick(folder)
+                clickFolder(folder)
               }}
               depth={folder.depth}
               className={clsx(!isFolderVisible(folder) && "hidden")}
@@ -173,12 +223,20 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
             </FolderExplorer.Item>
           ))}
       </div>
-      <div className="grid grid-cols-4 gap-4">
-        {getCurrentFolderContent()?.children?.map((file) => (
-          <FolderContentExplorer.Item>
-              {file.name} {file.type}
-          </FolderContentExplorer.Item>
-        )) }
+      <div>
+        <h3>{ getCurrentFolder()?.name }</h3>
+        <div className="grid grid-cols-4 gap-4">
+          {getCurrentFolderContent().map((file) => (
+            <FolderContentExplorer.Item onDoubleClick={() => {
+              if (file.type === "folder") {
+                data(file)
+                openFolder(file)
+              }
+            }}>
+                {file.name} {file.type}
+            </FolderContentExplorer.Item>
+          ))}
+        </div>
       </div>
     </div>
 )};
