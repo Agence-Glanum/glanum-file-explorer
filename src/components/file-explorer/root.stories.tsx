@@ -3,6 +3,8 @@ import { InternalFile } from "./use-file-explorer";
 import * as FolderExplorer from "../folder-explorer/folder-explorer";
 import * as FolderContentExplorer from "../folder-content-explorer/folder-content-explorer";
 import { useFileExplorer } from "./use-file-explorer";
+import { ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../context-menu/context-menu";
+import { ContextMenu } from "@radix-ui/react-context-menu";
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
@@ -200,7 +202,7 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
 
   return (
     <div className="flex">
-      <FolderExplorer.Root>
+      <FolderExplorer.Root estimateSize={40}>
           {folders.map((folder) =>(
             <FolderExplorer.Item
               key={folder.id}
@@ -212,30 +214,67 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
                 clickFolder(folder)
               }}
               style={{left: 15 * (folder.depth ?? 0)}}
+              className="mb-2"
             >
-              {folder.name} 
-              {folder.type === "folder" ? (
-                <span>
-                  {isFolderOpen(folder) ? "v" : ">"}
-                </span>
-              ): null}
+               <ContextMenu>
+                <ContextMenuTrigger asChild>
+                  <div className="py-1 px-2">
+                    {folder.name} 
+                    {folder.type === "folder" ? (
+                      <span>
+                        {isFolderOpen(folder) ? "v" : ">"}
+                      </span>
+                      ): null}
+                  </div>
+                </ContextMenuTrigger>
+                  <ContextMenuContent>
+                    <ContextMenuItem
+                      onClick={() => {
+                        data(folder)
+                        openFolderFromTree(folder)
+                      }}
+                    >
+                      {isFolderOpen(folder) ? "Close" : "Open"}
+                    </ContextMenuItem>
+                  </ContextMenuContent>
+              </ContextMenu>
             </FolderExplorer.Item>
           ))}
       </FolderExplorer.Root>
       <div>
         <h3>{ getCurrentFolder()?.name }</h3>
-        <div className="grid grid-cols-4 gap-4">
+        <FolderContentExplorer.Root className="grid grid-cols-4 gap-4">
           {getCurrentFolderContent().map((file) => (
-            <FolderContentExplorer.Item key={file.id} onDoubleClick={() => {
-              if (file.type === "folder") {
-                data(file)
-                openFolder(file)
-              }
-            }}>
-                {file.name} {file.type}
+            <FolderContentExplorer.Item
+              key={file.id}
+              onDoubleClick={() => {
+                if (file.type === "folder") {
+                  data(file)
+                  openFolder(file)
+                }
+              }}
+            >
+              <ContextMenu>
+                <ContextMenuTrigger asChild>
+                  <div className="py-1 px-2">
+                    {file.name} {file.type}
+                  </div>
+                </ContextMenuTrigger>
+                  <ContextMenuContent>
+                    <ContextMenuItem
+                      onClick={() => {
+                        data(file)
+                        openFolder(file)
+                      }}
+                    >
+                      Open
+                    </ContextMenuItem>
+                  </ContextMenuContent>
+              </ContextMenu>
+               
             </FolderContentExplorer.Item>
           ))}
-        </div>
+        </FolderContentExplorer.Root>
       </div>
     </div>
 )};
