@@ -5,10 +5,12 @@ type File = {
     id: string
     type: string
     name: string
+    sync: boolean
     meta?: {
         url?: string
-        parentDirId?: string
+        parentDirId: string
         thumbnail?: string
+        oldId?: string
     }
 }
 
@@ -89,6 +91,9 @@ const traverse = (
       },[]);
 }
 
+const generateId = () => {
+    return Math.random().toString(36).substring(2,15)
+}
 
 export function useFileExplorer({defaultFiles}: Props) {
 
@@ -163,7 +168,7 @@ export function useFileExplorer({defaultFiles}: Props) {
         setCurrentFolderId(folder.id)
     }, [])
 
-    const update = useCallback((updatedFiles: FolderFiles) => {
+    const updateFolder = useCallback((updatedFiles: FolderFiles) => {
         if (updatedFiles && updatedFiles.files.length > 0) {
             setFiles(produce((draft) => {
                 const parentFolder = searchInFiles(updatedFiles.id, draft)
@@ -174,6 +179,18 @@ export function useFileExplorer({defaultFiles}: Props) {
             }))
         }
     }, [setOpenFolders])
+
+    const updateFile = (file: InternalFile) => {
+        setFiles(produce((draft) => {
+            const id = file.meta?.oldId ?? file.id
+
+            const foundFile = searchInFiles(id, draft)
+
+            if (foundFile) {
+                Object.assign(foundFile, file)
+            }
+        }))
+    }
 
     const isFolderOpen = useCallback((folder: TreeInternalFile) => {
         return openFolders.includes(folder.id)
@@ -197,6 +214,72 @@ export function useFileExplorer({defaultFiles}: Props) {
         return (currentFolder as InternalFile).children ?? [] 
     }, [files, currentFolderId])
 
+    const createTempFolder = (parentFolder: InternalFile, defaultName: string = "New Folder") => {
+        if (parentFolder.type !== "folder") {
+            return
+        }
+
+        if (!parentFolder.sync) {
+            return
+        }
+
+        const newFolder = {
+            id: generateId(),
+            type: "folder",
+            name: defaultName,
+            sync: false,
+            meta: {
+                parentDirId: parentFolder.id
+            },
+            children: []
+        }
+
+        setFiles(produce((draft) => {
+            const folder = searchInFiles(parentFolder.id, draft)
+
+            if (folder && folder.children) {
+                folder.children.push(newFolder)
+            }
+        }))
+
+        return newFolder
+    }
+
+    const createTempFile = (
+        parentFolder: InternalFile, 
+        defaultName: string = "New Folder", 
+        type: string = "file"
+    ) => {
+        if (parentFolder.type !== "folder") {
+            return
+        }
+
+        if (!parentFolder.sync) {
+            return
+        }
+
+        const newFolder = {
+            id: generateId(),
+            type: type,
+            name: defaultName,
+            sync: false,
+            meta: {
+                parentDirId: parentFolder.id
+            },
+            children: []
+        }
+
+        setFiles(produce((draft) => {
+            const folder = searchInFiles(parentFolder.id, draft)
+
+            if (folder && folder.children) {
+                folder.children.push(newFolder)
+            }
+        }))
+
+        return newFolder
+    }
+
     return  {
         files,
         folders,
@@ -207,6 +290,9 @@ export function useFileExplorer({defaultFiles}: Props) {
         clickFolder,
         getCurrentFolder,
         getCurrentFolderContent,
-        update
+        updateFolder,
+        updateFile,
+        createTempFile,
+        createTempFolder
     }
 }

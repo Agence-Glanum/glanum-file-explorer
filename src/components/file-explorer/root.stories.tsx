@@ -1,33 +1,38 @@
 import { Meta, StoryFn } from "@storybook/react";
 import { InternalFile } from "./use-file-explorer";
+import * as Virtualizer from "../virtualizer/virtualizer";
 import * as FolderExplorer from "../folder-explorer/folder-explorer";
 import * as FolderContentExplorer from "../folder-content-explorer/folder-content-explorer";
 import { useFileExplorer } from "./use-file-explorer";
 import { ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../context-menu/context-menu";
 import { ContextMenu } from "@radix-ui/react-context-menu";
+import clsx from "clsx";
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
   title: "Root",
-  component: FolderExplorer.Root,
-} as Meta<typeof FolderExplorer.Root>;
+  component: FolderExplorer.Item,
+} as Meta<typeof FolderExplorer.Item>;
 
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
-const Template: StoryFn<typeof FolderExplorer.Root> = () => { 
+const Template: StoryFn<typeof FolderExplorer.Item> = () => { 
 
   const {
     folders,
     openFolder,
     openFolderFromTree,
     clickFolder,
-    update,
+    updateFolder,
     isFolderOpen,
     getCurrentFolder,
     getCurrentFolderContent,
+    createTempFolder,
+    updateFile
   } = useFileExplorer({
       defaultFiles: {files: [{
         id: "00001",
         name: "00001",
+        sync: true,
         type: "folder",
         meta: {
           parentDirId: "00000"
@@ -37,6 +42,7 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
         id: "00002",
         name: "00002",
         type: "folder",
+        sync: true,
         meta: {
           parentDirId: "00000"
         }
@@ -44,6 +50,7 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
         id: "00003",
         name: "00003",
         type: "folder",
+        sync: true,
         meta: {
           parentDirId: "00000"
         }
@@ -51,6 +58,7 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
         id: "00004",
         name: "00004",
         type: "folder",
+        sync: true,
         meta: {
           parentDirId: "00000"
         }
@@ -58,6 +66,7 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
         id: "00005",
         name: "00005",
         type: "folder",
+        sync: true,
         meta: {
           parentDirId: "00000"
         }
@@ -65,6 +74,7 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
         id: "00006",
         name: "00006",
         type: "folder",
+        sync: true,
         meta: {
           parentDirId: "00000"
         }
@@ -72,6 +82,7 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
         id: "00007",
         name: "00007",
         type: "folder",
+        sync: true,
         meta: {
           parentDirId: "00000"
         }
@@ -79,6 +90,7 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
         id: "00008",
         name: "00008",
         type: "folder",
+        sync: true,
         meta: {
           parentDirId: "00000"
         }
@@ -86,6 +98,7 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
         id: "00009",
         name: "00009",
         type: "folder",
+        sync: true,
         meta: {
           parentDirId: "00000"
         }
@@ -96,12 +109,13 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
 
   const data = (file: InternalFile) => {
     if (file.id === "00001") {
-      update({
+      updateFolder({
         files: [
           {
             id: "00011",
             name: "00011",
             type: "file",
+            sync: true,
             meta: {
               parentDirId: "00001"
             }
@@ -110,6 +124,7 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
             id: "00021",
             name: "00021",
             type: "folder",
+            sync: true,
             meta: {
               parentDirId: "00001"
             }
@@ -120,12 +135,13 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
     }
 
     if (file.id === "00021") {
-      update({
+      updateFolder({
         files: [
           {
             id: "00121",
             name: "00121",
             type: "folder",
+            sync: true,
             meta: {
               parentDirId: "00021"
             }
@@ -134,6 +150,7 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
             id: "00221",
             name: "00221",
             type: "folder",
+            sync: true,
             meta: {
               parentDirId: "00021"
             }
@@ -142,6 +159,7 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
             id: "00321",
             name: "00321",
             type: "folder",
+            sync: true,
             meta: {
               parentDirId: "00021"
             }
@@ -152,12 +170,13 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
     }
 
     if (file.id === "00321") {
-      update({
+      updateFolder({
         files: [
           {
             id: "01321",
             name: "01321",
             type: "folder",
+            sync: true,
             meta: {
               parentDirId: "00321"
             }
@@ -168,12 +187,13 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
     }
 
     if (file.id === "00121") {
-      update({
+      updateFolder({
         files: [
           {
             id: "01121",
             name: "01121",
             type: "file",
+            sync: true,
             meta: {
               parentDirId: "00121"
             }
@@ -184,12 +204,13 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
     }
 
     if (file.id === "00002") {
-      update({
+      updateFolder({
         files: [
           {
             id: "00012",
             name: "00012",
             type: "folder",
+            sync: true,
             meta: {
               parentDirId: "00002"
             }
@@ -202,7 +223,7 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
 
   return (
     <div className="flex">
-      <FolderExplorer.Root estimateSize={40}>
+      <Virtualizer.List estimateSize={40}>
           {folders.map((folder) =>(
             <FolderExplorer.Item
               key={folder.id}
@@ -240,41 +261,71 @@ const Template: StoryFn<typeof FolderExplorer.Root> = () => {
               </ContextMenu>
             </FolderExplorer.Item>
           ))}
-      </FolderExplorer.Root>
+      </Virtualizer.List>
       <div>
         <h3>{ getCurrentFolder()?.name }</h3>
-        <FolderContentExplorer.Root className="grid grid-cols-4 gap-4">
-          {getCurrentFolderContent().map((file) => (
-            <FolderContentExplorer.Item
-              key={file.id}
-              onDoubleClick={() => {
-                if (file.type === "folder") {
-                  data(file)
-                  openFolder(file)
+        <ContextMenu>
+          <ContextMenuTrigger>
+            <Virtualizer.Grid>
+              {getCurrentFolderContent().map((file) => (
+                <FolderContentExplorer.GridItem
+                  key={file.id}
+                  onDoubleClick={() => {
+                    if (file.type === "folder") {
+                      data(file)
+                      openFolder(file)
+                    }
+                  }}
+                  className={clsx(!file.sync && "bg-red-500")}
+                >
+                  <ContextMenu>
+                    <ContextMenuTrigger asChild>
+                      <div className="py-1 px-2">
+                        {file.name} {file.type}
+                      </div>
+                    </ContextMenuTrigger>
+                      <ContextMenuContent>
+                        <ContextMenuItem
+                          onClick={() => {
+                            data(file)
+                            openFolder(file)
+                          }}
+                        >
+                          Open
+                        </ContextMenuItem>
+                      </ContextMenuContent>
+                  </ContextMenu>
+                  
+                </FolderContentExplorer.GridItem>
+              ))}
+            </Virtualizer.Grid>
+          </ContextMenuTrigger>
+          <ContextMenuContent>
+            <ContextMenuItem
+              onClick={() => {
+                const currentFolder = getCurrentFolder()
+                if (!currentFolder) {
+                  return
                 }
+                const folder = createTempFolder(currentFolder)
+
+                if (!folder) {
+                  return
+                }
+
+                setTimeout(() => {
+                  updateFile({
+                    ...folder, 
+                    sync: true,
+                    meta: {...folder.meta, oldId: folder.id}
+                  })
+                }, 3000)
               }}
             >
-              <ContextMenu>
-                <ContextMenuTrigger asChild>
-                  <div className="py-1 px-2">
-                    {file.name} {file.type}
-                  </div>
-                </ContextMenuTrigger>
-                  <ContextMenuContent>
-                    <ContextMenuItem
-                      onClick={() => {
-                        data(file)
-                        openFolder(file)
-                      }}
-                    >
-                      Open
-                    </ContextMenuItem>
-                  </ContextMenuContent>
-              </ContextMenu>
-               
-            </FolderContentExplorer.Item>
-          ))}
-        </FolderContentExplorer.Root>
+              Create folder
+            </ContextMenuItem>
+          </ContextMenuContent>
+        </ContextMenu>
       </div>
     </div>
 )};
