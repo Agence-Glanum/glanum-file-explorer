@@ -247,7 +247,7 @@ export function useFileExplorer({defaultFiles}: Props) {
 
     const createTempFile = (
         parentFolder: InternalFile, 
-        defaultName: string = "New Folder", 
+        defaultName: string = "New file", 
         type: string = "file"
     ) => {
         if (parentFolder.type !== "folder") {

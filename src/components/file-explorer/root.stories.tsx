@@ -3,9 +3,9 @@ import { InternalFile } from "./use-file-explorer";
 import * as Virtualizer from "../virtualizer/virtualizer";
 import * as FolderExplorer from "../folder-explorer/folder-explorer";
 import * as FolderContentExplorer from "../folder-content-explorer/folder-content-explorer";
+import * as Dropzone from "../dropzone/dropzone";
 import { useFileExplorer } from "./use-file-explorer";
-import { ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../context-menu/context-menu";
-import { ContextMenu } from "@radix-ui/react-context-menu";
+import * as ContextMenu from "../context-menu/context-menu";
 import clsx from "clsx";
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
@@ -27,7 +27,8 @@ const Template: StoryFn<typeof FolderExplorer.Item> = () => {
     getCurrentFolder,
     getCurrentFolderContent,
     createTempFolder,
-    updateFile
+    updateFile,
+    createTempFile
   } = useFileExplorer({
       defaultFiles: {files: [{
         id: "00001",
@@ -237,8 +238,8 @@ const Template: StoryFn<typeof FolderExplorer.Item> = () => {
               style={{left: 15 * (folder.depth ?? 0)}}
               className="mb-2"
             >
-               <ContextMenu>
-                <ContextMenuTrigger asChild>
+               <ContextMenu.Root>
+                <ContextMenu.Trigger asChild>
                   <div className="py-1 px-2">
                     {folder.name} 
                     {folder.type === "folder" ? (
@@ -247,85 +248,102 @@ const Template: StoryFn<typeof FolderExplorer.Item> = () => {
                       </span>
                       ): null}
                   </div>
-                </ContextMenuTrigger>
-                  <ContextMenuContent>
-                    <ContextMenuItem
+                </ContextMenu.Trigger>
+                  <ContextMenu.Content>
+                    <ContextMenu.Item
                       onClick={() => {
                         data(folder)
                         openFolderFromTree(folder)
                       }}
                     >
                       {isFolderOpen(folder) ? "Close" : "Open"}
-                    </ContextMenuItem>
-                  </ContextMenuContent>
-              </ContextMenu>
+                    </ContextMenu.Item>
+                  </ContextMenu.Content>
+              </ContextMenu.Root>
             </FolderExplorer.Item>
           ))}
       </Virtualizer.List>
       <div>
         <h3>{ getCurrentFolder()?.name }</h3>
-        <ContextMenu>
-          <ContextMenuTrigger>
-            <Virtualizer.Grid>
-              {getCurrentFolderContent().map((file) => (
-                <FolderContentExplorer.GridItem
-                  key={file.id}
-                  onDoubleClick={() => {
-                    if (file.type === "folder") {
-                      data(file)
-                      openFolder(file)
-                    }
-                  }}
-                  className={clsx(!file.sync && "bg-red-500")}
-                >
-                  <ContextMenu>
-                    <ContextMenuTrigger asChild>
-                      <div className="py-1 px-2">
-                        {file.name} {file.type}
-                      </div>
-                    </ContextMenuTrigger>
-                      <ContextMenuContent>
-                        <ContextMenuItem
-                          onClick={() => {
-                            data(file)
-                            openFolder(file)
-                          }}
-                        >
-                          Open
-                        </ContextMenuItem>
-                      </ContextMenuContent>
-                  </ContextMenu>
-                  
-                </FolderContentExplorer.GridItem>
-              ))}
-            </Virtualizer.Grid>
-          </ContextMenuTrigger>
-          <ContextMenuContent>
-            <ContextMenuItem
-              onClick={() => {
-                const currentFolder = getCurrentFolder()
-                if (!currentFolder) {
-                  return
-                }
-                const folder = createTempFolder(currentFolder)
+        <Dropzone.Root
+          onNewFiles={(files) => {
+            const currentFolder = getCurrentFolder()
 
-                if (!folder) {
-                  return
-                }
+            if (!currentFolder) {
+              return
+            }
 
-                setTimeout(() => {
-                  updateFile({
-                    ...folder, 
-                    sync: true,
-                    meta: {...folder.meta, oldId: folder.id}
-                  })
-                }, 3000)
-              }}
-            >
-              Create folder
-            </ContextMenuItem>
-          </ContextMenuContent>
-        </ContextMenu>
+            files.map((file) => {
+              createTempFile(currentFolder, file.name)
+            })
+            
+          }}
+        >
+          <Dropzone.Overlay className="flex items-center justify-center">
+            Upload
+          </Dropzone.Overlay>
+          <ContextMenu.Root>
+            <ContextMenu.Trigger>
+              <Virtualizer.Grid>
+                {getCurrentFolderContent().map((file) => (
+                  <FolderContentExplorer.GridItem
+                    key={file.id}
+                    onDoubleClick={() => {
+                      if (file.type === "folder") {
+                        data(file)
+                        openFolder(file)
+                      }
+                    }}
+                    className={clsx(!file.sync && "bg-red-500")}
+                  >
+                    <ContextMenu.Root>
+                      <ContextMenu.Trigger asChild>
+                        <div className="py-1 px-2">
+                          {file.name} {file.type}
+                        </div>
+                      </ContextMenu.Trigger>
+                        <ContextMenu.Content>
+                          <ContextMenu.Item
+                            onClick={() => {
+                              data(file)
+                              openFolder(file)
+                            }}
+                          >
+                            Open
+                          </ContextMenu.Item>
+                        </ContextMenu.Content>
+                    </ContextMenu.Root>
+                  </FolderContentExplorer.GridItem>
+                ))}
+              </Virtualizer.Grid>
+            </ContextMenu.Trigger>
+            <ContextMenu.Content>
+              <ContextMenu.Item
+                onClick={() => {
+                  const currentFolder = getCurrentFolder()
+                  if (!currentFolder) {
+                    return
+                  }
+                  const folder = createTempFolder(currentFolder)
+
+                  if (!folder) {
+                    return
+                  }
+
+                  setTimeout(() => {
+                    updateFile({
+                      ...folder, 
+                      sync: true,
+                      meta: {...folder.meta, oldId: folder.id}
+                    })
+                  }, 3000)
+                }}
+              >
+                Create folder
+              </ContextMenu.Item>
+            </ContextMenu.Content>
+          </ContextMenu.Root>
+        </Dropzone.Root>
       </div>
     </div>
 )};
