@@ -228,38 +228,40 @@ const Template: StoryFn<typeof FolderExplorer.Item> = () => {
           {folders.map((folder) =>(
             <FolderExplorer.Item
               key={folder.id}
-              onDoubleClick={() => {
-                data(folder)
-                openFolderFromTree(folder)
-              }}
-              onClick={() => {
-                clickFolder(folder)
-              }}
-              style={{left: 15 * (folder.depth ?? 0)}}
-              className="mb-2"
+              className="h-[40px]"
             >
-               <ContextMenu.Root>
-                <ContextMenu.Trigger asChild>
-                  <div className="py-1 px-2">
-                    {folder.name} 
-                    {folder.type === "folder" ? (
-                      <span>
-                        {isFolderOpen(folder) ? "v" : ">"}
-                      </span>
+              <FolderExplorer.DepthIndicator depth={folder.depth}/>
+              <FolderExplorer.Content
+                onDoubleClick={() => {
+                  data(folder)
+                  openFolderFromTree(folder)
+                }}
+                onClick={() => {
+                  clickFolder(folder)
+                }}
+                depth={folder.depth}
+              >
+                <ContextMenu.Root>
+                  <ContextMenu.Trigger asChild>
+                    <div className="flex py-1 px-2 items-center">
+                      <span>{folder.name} </span>
+                      {folder.type === "folder" ? (
+                        <FolderExplorer.OpenIndicator open={isFolderOpen(folder)} />
                       ): null}
-                  </div>
-                </ContextMenu.Trigger>
-                  <ContextMenu.Content>
-                    <ContextMenu.Item
-                      onClick={() => {
-                        data(folder)
-                        openFolderFromTree(folder)
-                      }}
-                    >
-                      {isFolderOpen(folder) ? "Close" : "Open"}
-                    </ContextMenu.Item>
-                  </ContextMenu.Content>
-              </ContextMenu.Root>
+                    </div>
+                  </ContextMenu.Trigger>
+                    <ContextMenu.Content>
+                      <ContextMenu.Item
+                        onClick={() => {
+                          data(folder)
+                          openFolderFromTree(folder)
+                        }}
+                      >
+                        {isFolderOpen(folder) ? "Close" : "Open"}
+                      </ContextMenu.Item>
+                    </ContextMenu.Content>
+                </ContextMenu.Root>
+              </FolderExplorer.Content>
             </FolderExplorer.Item>
           ))}
       </Virtualizer.List>
