@@ -100,6 +100,7 @@ export function useFileExplorer({defaultFiles}: Props) {
     const [files, setFiles] = useState(convertToInternalFiles(defaultFiles.files))
     const [openFolders, setOpenFolders] = useState<Array<string>>([])
     const [currentFolderId, setCurrentFolderId] = useState<string|null>(null)
+    const [selectedFiles, setSelectedFiles] = useState<Array<InternalFile>>([])
 
     const isFolderVisible = useCallback((folder: TreeInternalFile) => {
         return  folder.parent.every(id => openFolders.includes(id)) || (folder.depth ?? 0) === 0
@@ -280,6 +281,12 @@ export function useFileExplorer({defaultFiles}: Props) {
         return newFolder
     }
 
+    const selectFile = (file: InternalFile|InternalFile[]) => {
+        const files = Array.isArray(file) ? file : [file]
+
+        setSelectedFiles(files)
+    }
+
     return  {
         files,
         folders,
@@ -293,6 +300,8 @@ export function useFileExplorer({defaultFiles}: Props) {
         updateFolder,
         updateFile,
         createTempFile,
-        createTempFolder
+        createTempFolder,
+        selectFile,
+        selectedFiles
     }
 }

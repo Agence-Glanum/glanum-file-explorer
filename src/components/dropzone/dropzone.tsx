@@ -60,7 +60,7 @@ const Root = ({ className, children, onNewFiles, ...props }: RootProps) => {
     return (
         <div
             className={cn(
-                "relative flex border w-fit rounded",
+                "relative flex w-fit",
                 className
             )}
             {...getRootProps()}

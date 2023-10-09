@@ -4,30 +4,37 @@ import { ReactElement, useRef } from "react"
 import { cn } from "../../utils/cn"
 
 interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
-    estimateSize?: number
+    estimateWidth?: number
+    estimeHeight?: number
+    columns?: number
     children: ReactElement[]|ReactElement
 }
 
-const Grid = ({className, estimateSize = 75, children}: GridProps) => {
+const Grid = ({
+    className,
+    columns = 5,
+    estimateWidth = 75,
+    estimeHeight = 75,
+    children,
+    ...props
+}: GridProps) => {
 
     const parentRef = useRef(null)
 
     const rows = Array.isArray(children) ? children : [children]
 
-    const column = 5
-
     const rowVirtualizer = useVirtualizer({
-        count: Math.ceil(rows.length / column),
+        count: Math.ceil(rows.length / columns),
         getScrollElement: () => parentRef.current,
-        estimateSize: () => estimateSize,
+        estimateSize: () => estimeHeight,
         overscan: 5,
     })
 
     const columnVirtualizer = useVirtualizer({
         horizontal: true,
-        count: column,
+        count: columns,
         getScrollElement: () => parentRef.current,
-        estimateSize: () => estimateSize,
+        estimateSize: () => estimateWidth,
         overscan: 5,
     })
 
@@ -35,12 +42,11 @@ const Grid = ({className, estimateSize = 75, children}: GridProps) => {
     <>
       <div
         ref={parentRef}
-        className="List"
-        style={{
-          height: `500px`,
-          width: `500px`,
-          overflow: 'auto',
-        }}
+        className={cn(
+            "h-[500px] w-[500px] overflow-auto",
+            className
+        )}
+        {...props}
       >
         <div
           style={{
@@ -52,7 +58,7 @@ const Grid = ({className, estimateSize = 75, children}: GridProps) => {
           {rowVirtualizer.getVirtualItems().map((virtualRow) => (
             <React.Fragment key={virtualRow.index}>
               {columnVirtualizer.getVirtualItems().map((virtualColumn) => {
-                const row = rows[(virtualRow.index * column) + virtualColumn.index]
+                const row = rows[(virtualRow.index * columns) + virtualColumn.index]
 
                 if (!row) {
                     return null

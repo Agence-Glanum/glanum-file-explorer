@@ -48,10 +48,11 @@ Item.displayName = "TreeExplorerItem"
 type DepthIndicatorProps = {
     className?: string | undefined
     depth?: number
+    step?: number
     offset?: number
 }
 
-const DepthIndicator = ({ className, depth = 0, offset = 15}: DepthIndicatorProps) => {
+const DepthIndicator = ({ className, depth = 0, step = 15, offset = 0}: DepthIndicatorProps) => {
     return (
         <>
             {[...Array(depth).keys()].map((depth) => (
@@ -61,7 +62,7 @@ const DepthIndicator = ({ className, depth = 0, offset = 15}: DepthIndicatorProp
                         "absolute top-[1px] bottom-[1px] border-l border-dashed border-gray-300 ",
                         className
                     )}
-                    style={{left: offset * depth}}
+                    style={{left: offset + step * depth}}
                 />
             ))}
         </>
@@ -82,11 +83,11 @@ const Content = ({ className, depth = 0, offset = 15, asChild = false, ...props 
     return (
         <Comp
             className={cn(
-                "absolute top-[2px] bottom-[2px] flex border w-fit rounded cursor-pointer",
+                "absolute top-[2px] bottom-[2px] flex items-center whitespace-nowrap cursor-pointer",
                 className
             )}
-            style={{left: offset * depth}}
             {...props}
+            style={{left: offset * depth}}
         />
     )
 }

@@ -11,7 +11,7 @@ const GridItem = ({ className, asChild = false, ...props }: GridItemProps) => {
 
     return <Comp
         className={cn(
-            "border cursor-pointer",
+            "text-gray-800",
             className
         )}
         {...props}
