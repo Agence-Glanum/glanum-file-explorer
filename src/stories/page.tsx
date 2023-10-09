@@ -1,56 +1,341 @@
-export const Page: React.FC = () => {
-  return (
-    <article>
+import type { InternalFile } from "../components/file-explorer/use-file-explorer";
+import * as Virtualizer from "../components/virtualizer/virtualizer";
+import * as FolderExplorer from "../components/folder-explorer/folder-explorer";
+import * as FolderContentExplorer from "../components/folder-content-explorer/folder-content-explorer";
+import * as Dropzone from "../components/dropzone/dropzone";
+import { useFileExplorer } from "../components/file-explorer/use-file-explorer";
+import * as ContextMenu from "../components/context-menu/context-menu";
+import clsx from "clsx";
 
-      <section>
-        <h2>Pages in Storybook</h2>
-        <p>
-          We recommend building UIs with a{' '}
-          <a href="https://componentdriven.org" target="_blank" rel="noopener noreferrer">
-            <strong>component-driven</strong>
-          </a>{' '}
-          process starting with atomic components and ending with pages.
-        </p>
-        <p>
-          Render pages with mock data. This makes it easy to build and review page states without
-          needing to navigate to them in your app. Here are some handy patterns for managing page
-          data in Storybook:
-        </p>
-        <ul>
-          <li>
-            Use a higher-level connected component. Storybook helps you compose such data from the
-            {"\""}args{"\""} of child component stories
-          </li>
-          <li>
-            Assemble data in the page component from your services. You can mock these services out
-            using Storybook.
-          </li>
-        </ul>
-        <p>
-          Get a guided tutorial on component-driven development at{' '}
-          <a href="https://storybook.js.org/tutorials/" target="_blank" rel="noopener noreferrer">
-            Storybook tutorials
-          </a>
-          . Read more in the{' '}
-          <a href="https://storybook.js.org/docs" target="_blank" rel="noopener noreferrer">
-            docs
-          </a>
-          .
-        </p>
-        <div className="tip-wrapper">
-          <span className="tip">Tip</span> Adjust the width of the canvas with the{' '}
-          <svg width="10" height="10" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
-            <g fill="none" fillRule="evenodd">
-              <path
-                d="M1.5 5.2h4.8c.3 0 .5.2.5.4v5.1c-.1.2-.3.3-.4.3H1.4a.5.5 0 01-.5-.4V5.7c0-.3.2-.5.5-.5zm0-2.1h6.9c.3 0 .5.2.5.4v7a.5.5 0 01-1 0V4H1.5a.5.5 0 010-1zm0-2.1h9c.3 0 .5.2.5.4v9.1a.5.5 0 01-1 0V2H1.5a.5.5 0 010-1zm4.3 5.2H2V10h3.8V6.2z"
-                id="a"
-                fill="#999"
-              />
-            </g>
-          </svg>
-          Viewports addon in the toolbar
-        </div>
-      </section>
-    </article>
-  );
-};
+export const Page: React.FC = () => {
+  const {
+    folders,
+    openFolder,
+    openFolderFromTree,
+    clickFolder,
+    updateFolder,
+    isFolderOpen,
+    getCurrentFolder,
+    getCurrentFolderContent,
+    createTempFolder,
+    updateFile,
+    createTempFile
+  } = useFileExplorer({
+      defaultFiles: {files: [{
+        id: "00001",
+        name: "00001",
+        sync: true,
+        type: "folder",
+        meta: {
+          parentDirId: "00000"
+        }
+      },
+      {
+        id: "00002",
+        name: "00002",
+        type: "folder",
+        sync: true,
+        meta: {
+          parentDirId: "00000"
+        }
+      },{
+        id: "00003",
+        name: "00003",
+        type: "folder",
+        sync: true,
+        meta: {
+          parentDirId: "00000"
+        }
+      },{
+        id: "00004",
+        name: "00004",
+        type: "folder",
+        sync: true,
+        meta: {
+          parentDirId: "00000"
+        }
+      },{
+        id: "00005",
+        name: "00005",
+        type: "folder",
+        sync: true,
+        meta: {
+          parentDirId: "00000"
+        }
+      },{
+        id: "00006",
+        name: "00006",
+        type: "folder",
+        sync: true,
+        meta: {
+          parentDirId: "00000"
+        }
+      },{
+        id: "00007",
+        name: "00007",
+        type: "folder",
+        sync: true,
+        meta: {
+          parentDirId: "00000"
+        }
+      },{
+        id: "00008",
+        name: "00008",
+        type: "folder",
+        sync: true,
+        meta: {
+          parentDirId: "00000"
+        }
+      },{
+        id: "00009",
+        name: "00009",
+        type: "folder",
+        sync: true,
+        meta: {
+          parentDirId: "00000"
+        }
+      }], 
+      id: "00000"
+    }
+  })
+
+  const data = (file: InternalFile) => {
+    if (file.id === "00001") {
+      updateFolder({
+        files: [
+          {
+            id: "00011",
+            name: "00011",
+            type: "file",
+            sync: true,
+            meta: {
+              parentDirId: "00001"
+            }
+          },
+          {
+            id: "00021",
+            name: "00021",
+            type: "folder",
+            sync: true,
+            meta: {
+              parentDirId: "00001"
+            }
+          }
+        ],
+        id: "00001"
+      })
+    }
+
+    if (file.id === "00021") {
+      updateFolder({
+        files: [
+          {
+            id: "00121",
+            name: "00121",
+            type: "folder",
+            sync: true,
+            meta: {
+              parentDirId: "00021"
+            }
+          },
+          {
+            id: "00221",
+            name: "00221",
+            type: "folder",
+            sync: true,
+            meta: {
+              parentDirId: "00021"
+            }
+          },
+          {
+            id: "00321",
+            name: "00321",
+            type: "folder",
+            sync: true,
+            meta: {
+              parentDirId: "00021"
+            }
+          },
+        ],
+        id: "00021"
+      })
+    }
+
+    if (file.id === "00321") {
+      updateFolder({
+        files: [
+          {
+            id: "01321",
+            name: "01321",
+            type: "folder",
+            sync: true,
+            meta: {
+              parentDirId: "00321"
+            }
+          },
+        ],
+        id: "00321"
+      })
+    }
+
+    if (file.id === "00121") {
+      updateFolder({
+        files: [
+          {
+            id: "01121",
+            name: "01121",
+            type: "file",
+            sync: true,
+            meta: {
+              parentDirId: "00121"
+            }
+          },
+        ],
+        id: "00121"
+      })
+    }
+
+    if (file.id === "00002") {
+      updateFolder({
+        files: [
+          {
+            id: "00012",
+            name: "00012",
+            type: "folder",
+            sync: true,
+            meta: {
+              parentDirId: "00002"
+            }
+          },
+        ],
+        id: "00002"
+      })
+    }
+  }
+
+  return (
+    <div className="flex">
+      <Virtualizer.List estimateSize={40}>
+          {folders.map((folder) =>(
+            <FolderExplorer.Item
+              key={folder.id}
+              className="h-[40px]"
+            >
+              <FolderExplorer.DepthIndicator depth={folder.depth}/>
+              <FolderExplorer.Content
+                onDoubleClick={() => {
+                  data(folder)
+                  openFolderFromTree(folder)
+                }}
+                onClick={() => {
+                  clickFolder(folder)
+                }}
+                depth={folder.depth}
+              >
+                <ContextMenu.Root>
+                  <ContextMenu.Trigger asChild>
+                    <div className="flex py-1 px-2 items-center">
+                      <span>{folder.name} </span>
+                      <FolderExplorer.OpenIndicator open={isFolderOpen(folder)} />
+                    </div>
+                  </ContextMenu.Trigger>
+                    <ContextMenu.Content>
+                      <ContextMenu.Item
+                        onClick={() => {
+                          data(folder)
+                          openFolderFromTree(folder)
+                        }}
+                      >
+                        {isFolderOpen(folder) ? "Close" : "Open"}
+                      </ContextMenu.Item>
+                    </ContextMenu.Content>
+                </ContextMenu.Root>
+              </FolderExplorer.Content>
+            </FolderExplorer.Item>
+          ))}
+      </Virtualizer.List>
+      <div>
+        <h3>{ getCurrentFolder()?.name }</h3>
+        <Dropzone.Root
+          onNewFiles={(files) => {
+            const currentFolder = getCurrentFolder()
+
+            if (!currentFolder) {
+              return
+            }
+
+            files.map((file) => {
+              createTempFile(currentFolder, file.name)
+            })
+            
+          }}
+        >
+          <Dropzone.Overlay className="flex items-center justify-center">
+            Upload
+          </Dropzone.Overlay>
+          <ContextMenu.Root>
+            <ContextMenu.Trigger>
+              <Virtualizer.Grid>
+                {getCurrentFolderContent().map((file) => (
+                  <FolderContentExplorer.GridItem
+                    key={file.id}
+                    onDoubleClick={() => {
+                      if (file.type === "folder") {
+                        data(file)
+                        openFolder(file)
+                      }
+                    }}
+                    className={clsx(!file.sync && "bg-red-500")}
+                  >
+                    <ContextMenu.Root>
+                      <ContextMenu.Trigger asChild>
+                        <div className="py-1 px-2">
+                          {file.name} {file.type}
+                        </div>
+                      </ContextMenu.Trigger>
+                        <ContextMenu.Content>
+                          <ContextMenu.Item
+                            onClick={() => {
+                              data(file)
+                              openFolder(file)
+                            }}
+                          >
+                            Open
+                          </ContextMenu.Item>
+                        </ContextMenu.Content>
+                    </ContextMenu.Root>
+                  </FolderContentExplorer.GridItem>
+                ))}
+              </Virtualizer.Grid>
+            </ContextMenu.Trigger>
+            <ContextMenu.Content>
+              <ContextMenu.Item
+                onClick={() => {
+                  const currentFolder = getCurrentFolder()
+                  if (!currentFolder) {
+                    return
+                  }
+                  const folder = createTempFolder(currentFolder)
+
+                  if (!folder) {
+                    return
+                  }
+
+                  setTimeout(() => {
+                    updateFile({
+                      ...folder, 
+                      sync: true,
+                      meta: {...folder.meta, oldId: folder.id}
+                    })
+                  }, 3000)
+                }}
+              >
+                Create folder
+              </ContextMenu.Item>
+            </ContextMenu.Content>
+          </ContextMenu.Root>
+        </Dropzone.Root>
+      </div>
+    </div>
+  )
+}
