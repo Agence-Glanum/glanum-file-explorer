@@ -50,4 +50,3 @@ const generateFolder = (name: string, depth: number, maxDepth: number) => {
     const additionalFolders = generateCompleteStructure(2000);
     
     folder.push(...additionalFolders);
-    console.log("🚀 ~ file: data.ts:3 ~ folder:", folder)
