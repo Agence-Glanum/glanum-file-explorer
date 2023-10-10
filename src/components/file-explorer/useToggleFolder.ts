@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useState } from 'react';
 import { folders } from "./data";
-import FolderExplorer from "./folder-explorer";
-import { FolderInterface } from "./interfaces/file-explorer-interface";
+import { FolderInterface } from './interfaces/file-explorer-interface';
 
-function FileExplorer() {
-  const [openFolders, setOpenFolders] = useState<Array<string>>([]);
+const useFolderToggle = (initialFolders: any) => {
+  const [openFolders, setOpenFolders] = useState(initialFolders);
 
   const toggleFolder = (folderName: string) => {
     if (openFolders.includes(folderName)) {
@@ -21,8 +20,8 @@ function FileExplorer() {
     if (folderToClose) {
       folderToClose.content.forEach((item: FolderInterface) => {
         if (item.content) {
-          setOpenFolders((prevOpenFolders) =>
-            prevOpenFolders.filter((name) => name !== item.name)
+          setOpenFolders((prevOpenFolders: any) =>
+            prevOpenFolders.filter((name: string) => name !== item.name)
           );
           closeSubfolders(item.name);
         }
@@ -30,13 +29,13 @@ function FileExplorer() {
     }
   };
 
-  const findFolder = (folders: any, folderName: string) => {
+  const findFolder: any = (folders: any, folderName: string) => {
     for (const folder of folders) {
       if (folder.name === folderName) {
         return folder;
       }
       if (folder.content) {
-        const result: FolderInterface = findFolder(folder.content, folderName);
+        const result = findFolder(folder.content, folderName);
         if (result) {
           return result;
         }
@@ -45,17 +44,7 @@ function FileExplorer() {
     return null;
   };
 
-  const props = {
-    folder: folders,
-    toggleFolder,
-    openFolders,
-  };
+  return { openFolders, toggleFolder };
+};
 
-  return (
-    <div>
-      <FolderExplorer {...props} />
-    </div>
-  );
-}
-
-export default FileExplorer;
+export default useFolderToggle;
