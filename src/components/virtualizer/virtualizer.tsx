@@ -146,6 +146,7 @@ const List = ({className, estimateSize = 35, children, ...props}: ListProps) => 
                                 transform: `translateY(${virtualRow.start}px)`,
                                 ...row.props.style
                             }}
+                            className="w-full flex items-center"
                         >
                             {cloneElement(row)}
                         </div>

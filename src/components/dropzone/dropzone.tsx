@@ -43,7 +43,7 @@ const Root = ({ className, children, onNewFiles, ...props }: RootProps) => {
         }
 
         return children.find((children) => 
-            children.type.displayName === Overlay.displayName
+            children?.type.displayName === Overlay.displayName
         ) ?? null
     }, [children])
 
@@ -53,7 +53,7 @@ const Root = ({ className, children, onNewFiles, ...props }: RootProps) => {
         }
 
         return children.filter((children) => 
-            children.type.displayName !== Overlay.displayName
+            children?.type.displayName !== Overlay.displayName
         )
     }, [children])
 

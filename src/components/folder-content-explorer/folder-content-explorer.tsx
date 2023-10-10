@@ -2,6 +2,24 @@ import { Slot } from "@radix-ui/react-slot";
 import { cn } from "../../utils/cn";
 import React, { useEffect, useImperativeHandle, useRef } from "react";
 
+interface ListItemProps extends React.HTMLAttributes<HTMLDivElement> {
+    asChild?: boolean
+}
+
+const ListItem = ({ className, asChild = false, ...props }: ListItemProps) => {
+    const Comp = asChild ? Slot : 'div';
+
+    return <Comp
+        className={cn(
+            "w-full flex items-center text-gray-800 cursor-pointer",
+            className
+        )}
+        {...props}
+     />
+}
+
+ListItem.displayName = "FolderContentExplorerListItem"
+
 interface GridItemProps extends React.HTMLAttributes<HTMLDivElement> {
     asChild?: boolean
 }
@@ -67,4 +85,4 @@ const RenameInput =  React.forwardRef<HTMLInputElement, RenameInputProps>(({ cla
 
 RenameInput.displayName = "FolderContentExplorerRenameInput"
 
-export { GridItem, RenameInput }
+export { ListItem, GridItem, RenameInput }

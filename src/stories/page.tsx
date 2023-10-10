@@ -5,12 +5,13 @@ import * as FolderContentExplorer from "../components/folder-content-explorer/fo
 import * as Dropzone from "../components/dropzone/dropzone";
 import { useFileExplorer } from "../components/file-explorer/use-file-explorer";
 import * as ContextMenu from "../components/context-menu/context-menu";
-import { ArchiveIcon, CrumpledPaperIcon, FileIcon } from "@radix-ui/react-icons";
+import { ArchiveIcon, CrumpledPaperIcon, DashboardIcon, FileIcon, InputIcon, ListBulletIcon } from "@radix-ui/react-icons";
+import * as TogglePrimitive from "@radix-ui/react-toggle"
 import { useState } from "react";
 
 export const Page: React.FC = () => {
 
-  
+  const [layout, setLayout] = useState<'list'|'grid'>('grid')
 
   const {
     folders,
@@ -292,8 +293,28 @@ export const Page: React.FC = () => {
             </FolderExplorer.Item>
           ))}
       </Virtualizer.List>
-      <div className="pl-4">
-        <h3 className="text-xl font-semibold">{ getCurrentFolder()?.name }</h3>
+      <div className="px-4">
+        <div className="flex justify-between">
+          <h3 className="text-xl font-semibold">{ getCurrentFolder()?.name }</h3>
+          <div>
+            <TogglePrimitive.Root 
+              className="h-9 px-3 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-600 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-gray-200 data-[state=on]:text-gray-800"
+              pressed={layout === 'grid'}
+              onPressedChange={() => setLayout('grid')}
+            >
+              <DashboardIcon className="h-4 w-4" />
+            </TogglePrimitive.Root>
+            <TogglePrimitive.Root
+              className="ml-1 h-9 px-3 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-600 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-gray-200 data-[state=on]:text-gray-800"
+              pressed={layout === 'list'}
+              onPressedChange={() => setLayout('list')}
+            >
+              <ListBulletIcon className="h-4 w-4" />
+            </TogglePrimitive.Root>
+          </div>
+          
+        </div>
+        
         <Dropzone.Root
           className="mt-6"
           onNewFiles={(files) => {
@@ -312,122 +333,179 @@ export const Page: React.FC = () => {
           <Dropzone.Overlay className="flex items-center justify-center">
             Upload
           </Dropzone.Overlay>
-          <ContextMenu.Root>
-            <ContextMenu.Trigger>
-              <Virtualizer.Grid
-                estimeHeight={115}
-                estimateWidth={150}
-                className="w-full"
-              >
-                {getCurrentFolderContent().map((file) => (
-                  <FolderContentExplorer.GridItem
-                    key={file.id}
-                    onDoubleClick={() => {
-                      if (file.type === "folder") {
-                        data(file)
-                        openFolder(file)
-                      }
-                    }}
-                    onClick={() => {
-                      selectFile(file)
-                    }}
-                    className="py-1 px-2"
-                  >
-                    <ContextMenu.Root>
-                      <ContextMenu.Trigger asChild>
-                        <div title={file.name} className="py-2 px-4 flex flex-col justify-center items-center border whitespace-nowrap rounded cursor-pointer ">
-                          {file.type === "folder" ? (
-                            <ArchiveIcon className="h-16 w-16 text-gray-600" />
-                          ): null}
-                           {file.type === "file" ? (
-                            <FileIcon className="h-16 w-16 text-gray-600" />
-                          ): null}
-                          {file.renaming ? (
-                            <FolderContentExplorer.RenameInput
-                              type="text"
-                              defaultValue={file.name}
-                              onKeyUp={(e) => {
-                                if(e.key === 'Enter'){
-                                  rename({...file, name: e.target.value})
-                                }
-                              }}
-                              onClickOutside={(value) => {
-                                rename({...file, name: value})
-                              }}
-                            />
-                          ): (
-                            <div className="font-semibold max-w-[120px] truncate">
-                              {file.name}
-                            </div>
-                          )}
-                         
-                        </div>
-                      </ContextMenu.Trigger>
-                        <ContextMenu.Content>
-                          {file.type === "folder" ? (
-                            <ContextMenu.Item
+          {layout === 'grid' ? (
+            <ContextMenu.Root>
+              <ContextMenu.Trigger>
+                <Virtualizer.Grid
+                  estimeHeight={115}
+                  estimateWidth={150}
+                  className="w-full"
+                >
+                  {getCurrentFolderContent().map((file) => (
+                    <FolderContentExplorer.GridItem
+                      key={file.id}
+                      onDoubleClick={() => {
+                        if (file.type === "folder") {
+                          data(file)
+                          openFolder(file)
+                        }
+                      }}
+                      onClick={(e) => {
+                        selectFile(file)
+                      }}
+                      className="py-1 px-2"
+                    >
+                      <ContextMenu.Root>
+                        <ContextMenu.Trigger asChild>
+                          <div title={file.name} className="py-2 px-4 flex flex-col justify-center items-center border whitespace-nowrap rounded cursor-pointer ">
+                            {file.type === "folder" ? (
+                              <ArchiveIcon className="h-16 w-16 text-gray-600" />
+                            ): null}
+                            {file.type === "file" ? (
+                              <FileIcon className="h-16 w-16 text-gray-600" />
+                            ): null}
+                            {file.renaming ? (
+                              <FolderContentExplorer.RenameInput
+                                type="text"
+                                defaultValue={file.name}
+                                onKeyUp={(e) => {
+                                  if(e.key === 'Enter'){
+                                    rename({...file, name: e.target.value})
+                                  }
+                                }}
+                                onClickOutside={(value) => {
+                                  rename({...file, name: value})
+                                }}
+                              />
+                            ): (
+                              <div className="font-semibold max-w-[120px] truncate">
+                                {file.name}
+                              </div>
+                            )}
+                          
+                          </div>
+                        </ContextMenu.Trigger>
+                          <ContextMenu.Content>
+                            {file.type === "folder" ? (
+                              <ContextMenu.Item
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  data(file)
+                                  openFolder(file)
+                                }}
+                              >
+                                Open
+                              </ContextMenu.Item>
+                            ): null}
+                              <ContextMenu.Item
                               onClick={() => {
-                                data(file)
-                                openFolder(file)
+                                startRenaming(file)
                               }}
                             >
-                              Open
+                              Rename
                             </ContextMenu.Item>
-                          ): null}
-                            <ContextMenu.Item
-                            onClick={() => {
-                              startRenaming(file)
-                            }}
-                          >
-                            Rename
-                          </ContextMenu.Item>
-                        </ContextMenu.Content>
-                    </ContextMenu.Root>
-                  </FolderContentExplorer.GridItem>
-                ))}
-              </Virtualizer.Grid>
-            </ContextMenu.Trigger>
-            <ContextMenu.Content className="w-48">
-              {getCurrentFolder() !== null ? (
-                <>
-                  <ContextMenu.Item inset
-                    onClick={() => {
-                      const currentFolder = getCurrentFolder()
-                      if (!currentFolder) {
-                        return
-                      }
-                      const folder = createTempFolder(currentFolder, "New folder")
+                          </ContextMenu.Content>
+                      </ContextMenu.Root>
+                    </FolderContentExplorer.GridItem>
+                  ))}
+                </Virtualizer.Grid>
+              </ContextMenu.Trigger>
+              <ContextMenu.Content className="w-48">
+                {getCurrentFolder() !== null ? (
+                  <>
+                    <ContextMenu.Item inset
+                      onClick={() => {
+                        const currentFolder = getCurrentFolder()
+                        if (!currentFolder) {
+                          return
+                        }
+                        const folder = createTempFolder(currentFolder)
 
-                      if (!folder) {
-                        return
-                      }
+                        if (!folder) {
+                          return
+                        }
 
-                      setTimeout(() => {
-                        updateFile({
-                          ...folder, 
-                          sync: true,
-                          meta: {...folder.meta, oldId: folder.id}
-                        })
-                      }, 3000)
-                    }}
+                        setTimeout(() => {
+                          updateFile({
+                            ...folder, 
+                            sync: true,
+                            meta: {...folder.meta, oldId: folder.id}
+                          })
+                        }, 3000)
+                      }}
+                    >
+                      Create folder
+                      <ContextMenu.Shortcut>⌘F</ContextMenu.Shortcut>
+                    </ContextMenu.Item>
+                    <ContextMenu.Item inset>
+                      Reload
+                      <ContextMenu.Shortcut>⌘R</ContextMenu.Shortcut>
+                    </ContextMenu.Item>
+                    <ContextMenu.Separator />
+                  </>
+                ) : null} 
+                <ContextMenu.CheckboxItem checked>
+                  Show grid
+                  <ContextMenu.Shortcut>⌘⇧B</ContextMenu.Shortcut>
+                </ContextMenu.CheckboxItem>
+                <ContextMenu.CheckboxItem>Show list</ContextMenu.CheckboxItem>
+              </ContextMenu.Content>
+            </ContextMenu.Root>
+          ) : null}
+          {layout === 'list' ? (
+            <Virtualizer.List className="h-full w-[750px]" estimateSize={50}>
+              {getCurrentFolderContent().map((file) => (
+                <FolderContentExplorer.ListItem
+                  key={file.id}
+                  onDoubleClick={() => {
+                    if (file.type === "folder") {
+                      data(file)
+                      openFolder(file)
+                    }
+                  }}
+                  onClick={(e) => {
+                    selectFile(file)
+                  }}
+                  className="justify-between"
+                >
+                  <div className="flex items-center">
+                    {file.type === "folder" ? (
+                      <ArchiveIcon className="h-6 w-6 text-gray-600" />
+                    ): null}
+                    {file.type === "file" ? (
+                      <FileIcon className="h-6 w-6 text-gray-600" />
+                    ): null}
+                    {file.renaming ? (
+                      <FolderContentExplorer.RenameInput
+                        type="text"
+                        defaultValue={file.name}
+                        onKeyUp={(e) => {
+                          if(e.key === 'Enter'){
+                            rename({...file, name: e.target.value})
+                          }
+                        }}
+                        onClickOutside={(value) => {
+                          rename({...file, name: value})
+                        }}
+                        className="ml-2"
+                      />
+                    ): (
+                      <div className="ml-2 font-semibold max-w-[120px] truncate">
+                        {file.name}
+                      </div>
+                    )}
+                  </div>
+                  <div
+                    className="h-9 px-3 py-2 border border-gray-200 bg-transparent shadow-sm hover:bg-gray-100 hover:text-gray-800 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-600 disabled:pointer-events-none disabled:opacity-50"
+                    onClick={() => startRenaming(file)}
                   >
-                    Create folder
-                    <ContextMenu.Shortcut>⌘F</ContextMenu.Shortcut>
-                  </ContextMenu.Item>
-                  <ContextMenu.Item inset>
-                    Reload
-                    <ContextMenu.Shortcut>⌘R</ContextMenu.Shortcut>
-                  </ContextMenu.Item>
-                  <ContextMenu.Separator />
-                </>
-              ) : null} 
-              <ContextMenu.CheckboxItem checked>
-                Show grid
-                <ContextMenu.Shortcut>⌘⇧B</ContextMenu.Shortcut>
-              </ContextMenu.CheckboxItem>
-              <ContextMenu.CheckboxItem>Show list</ContextMenu.CheckboxItem>
-            </ContextMenu.Content>
-          </ContextMenu.Root>
+                      <InputIcon className="h-4 w-4" />
+                  </div>
+                </FolderContentExplorer.ListItem>
+              ))}
+            </ Virtualizer.List>
+          ) : null}
+          
         </Dropzone.Root>
       </div>
       <div className="border-l border-gray-300">

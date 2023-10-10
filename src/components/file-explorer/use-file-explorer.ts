@@ -33,7 +33,7 @@ type Props = {
 const convertToInternalFiles = (files: File[]) => {
     return files.map((file) => {
         if (file.type !== "folder") {
-            return file
+            return {...file, renaming: false}
         }
 
         return {
@@ -144,6 +144,7 @@ export function useFileExplorer({defaultFiles}: Props) {
                 draft.splice(index, 1)
             }
         }))
+        setSelectedFiles([])
         setCurrentFolderId(folder.id)
     }, [])
 
@@ -165,12 +166,14 @@ export function useFileExplorer({defaultFiles}: Props) {
                 }
             }
         }))
+        setSelectedFiles([])
         setCurrentFolderId(folder.id)
     }, [files])
 
-    const clickFolder = useCallback((folder: TreeInternalFile) => {
+    const clickFolder = (folder: TreeInternalFile) => {
+        setSelectedFiles([])
         setCurrentFolderId(folder.id)
-    }, [])
+    }
 
     const updateFolder = useCallback((updatedFiles: FolderFiles) => {
         if (updatedFiles && updatedFiles.files.length > 0) {
@@ -240,7 +243,7 @@ export function useFileExplorer({defaultFiles}: Props) {
         }
 
         setFiles(produce((draft) => {
-            const folder = searchInFiles(parentFolder.id, draft  as InternalFile[])
+            const folder = searchInFiles(parentFolder.id, draft)
 
             if (folder && folder.children) {
                 folder.children.push(newFolder)
@@ -276,7 +279,7 @@ export function useFileExplorer({defaultFiles}: Props) {
         }
 
         setFiles(produce((draft) => {
-            const folder = searchInFiles(parentFolder.id, draft as InternalFile[])
+            const folder = searchInFiles(parentFolder.id, draft)
 
             if (folder && folder.children) {
                 folder.children.push(newFolder)
