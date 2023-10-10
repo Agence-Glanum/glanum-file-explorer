@@ -10,7 +10,7 @@ import { useState } from "react";
 
 export const Page: React.FC = () => {
 
-  const [renaming, setRenaming] = useState<InternalFile|null>(null)
+  
 
   const {
     folders,
@@ -25,7 +25,9 @@ export const Page: React.FC = () => {
     updateFile,
     createTempFile,
     selectFile,
-    selectedFiles
+    selectedFiles,
+    rename,
+    startRenaming
   } = useFileExplorer({
       defaultFiles: {files: [{
         id: "00001",
@@ -340,17 +342,17 @@ export const Page: React.FC = () => {
                            {file.type === "file" ? (
                             <FileIcon className="h-16 w-16 text-gray-600" />
                           ): null}
-                          {renaming?.id === file.id ? (
-                            <input
+                          {file.renaming ? (
+                            <FolderContentExplorer.RenameInput
                               type="text"
                               defaultValue={file.name}
                               onKeyUp={(e) => {
                                 if(e.key === 'Enter'){
-                                  const update = {...file, name: e.target.value}
-                                  updateFile(update)
-                                  selectFile(update)
-                                  setRenaming(null)
+                                  rename({...file, name: e.target.value})
                                 }
+                              }}
+                              onClickOutside={(value) => {
+                                rename({...file, name: value})
                               }}
                             />
                           ): (
@@ -374,7 +376,7 @@ export const Page: React.FC = () => {
                           ): null}
                             <ContextMenu.Item
                             onClick={() => {
-                              setRenaming(file)
+                              startRenaming(file)
                             }}
                           >
                             Rename

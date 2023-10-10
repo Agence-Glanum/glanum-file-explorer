@@ -22,6 +22,7 @@ type FolderFiles = {
 
 export interface InternalFile extends File {
     children?: InternalFile[]
+    renaming: boolean
 }
 
 
@@ -37,7 +38,8 @@ const convertToInternalFiles = (files: File[]) => {
 
         return {
             ...file,
-            children: []
+            children: [],
+            renaming: false
         }
     })
 }
@@ -101,6 +103,7 @@ export function useFileExplorer({defaultFiles}: Props) {
     const [openFolders, setOpenFolders] = useState<Array<string>>([])
     const [currentFolderId, setCurrentFolderId] = useState<string|null>(null)
     const [selectedFiles, setSelectedFiles] = useState<Array<InternalFile>>([])
+    const [renaming, setRenaming] = useState<InternalFile|null>(null)
 
     const isFolderVisible = useCallback((folder: TreeInternalFile) => {
         return  folder.parent.every(id => openFolders.includes(id)) || (folder.depth ?? 0) === 0
@@ -229,6 +232,7 @@ export function useFileExplorer({defaultFiles}: Props) {
             type: "folder",
             name: defaultName,
             sync: false,
+            renaming: true,
             meta: {
                 parentDirId: parentFolder.id
             },
@@ -236,7 +240,7 @@ export function useFileExplorer({defaultFiles}: Props) {
         }
 
         setFiles(produce((draft) => {
-            const folder = searchInFiles(parentFolder.id, draft)
+            const folder = searchInFiles(parentFolder.id, draft  as InternalFile[])
 
             if (folder && folder.children) {
                 folder.children.push(newFolder)
@@ -264,6 +268,7 @@ export function useFileExplorer({defaultFiles}: Props) {
             type: type,
             name: defaultName,
             sync: false,
+            renaming: true,
             meta: {
                 parentDirId: parentFolder.id
             },
@@ -271,7 +276,7 @@ export function useFileExplorer({defaultFiles}: Props) {
         }
 
         setFiles(produce((draft) => {
-            const folder = searchInFiles(parentFolder.id, draft)
+            const folder = searchInFiles(parentFolder.id, draft as InternalFile[])
 
             if (folder && folder.children) {
                 folder.children.push(newFolder)
@@ -285,6 +290,25 @@ export function useFileExplorer({defaultFiles}: Props) {
         const files = Array.isArray(file) ? file : [file]
 
         setSelectedFiles(files)
+    }
+
+    const startRenaming = (file: InternalFile) => {
+        if (renaming !== null) {
+            return
+        }
+
+        updateFile({...file, renaming: true})
+        setRenaming(file)
+    }
+
+    const rename = (file: InternalFile) => {
+        if (!file.renaming) {
+            return
+        }
+
+        updateFile({...file, renaming: false})
+        setRenaming(null)
+        selectFile(file)
     }
 
     return  {
@@ -302,6 +326,8 @@ export function useFileExplorer({defaultFiles}: Props) {
         createTempFile,
         createTempFolder,
         selectFile,
-        selectedFiles
+        selectedFiles,
+        rename,
+        startRenaming,
     }
 }
