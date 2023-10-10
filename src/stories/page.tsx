@@ -20,8 +20,8 @@ export const Page: React.FC = () => {
     clickFolder,
     updateFolder,
     isFolderOpen,
-    getCurrentFolder,
-    getCurrentFolderContent,
+    currentFolder,
+    currentFolderContent,
     createTempFolder,
     updateFile,
     createTempFile,
@@ -295,7 +295,7 @@ export const Page: React.FC = () => {
       </Virtualizer.List>
       <div className="px-4">
         <div className="flex justify-between">
-          <h3 className="text-xl font-semibold">{ getCurrentFolder()?.name }</h3>
+          <h3 className="text-xl font-semibold">{ currentFolder?.name }</h3>
           <div>
             <TogglePrimitive.Root 
               className="h-9 px-3 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-600 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-gray-200 data-[state=on]:text-gray-800"
@@ -318,8 +318,6 @@ export const Page: React.FC = () => {
         <Dropzone.Root
           className="mt-6"
           onNewFiles={(files) => {
-            const currentFolder = getCurrentFolder()
-
             if (!currentFolder) {
               return
             }
@@ -341,7 +339,7 @@ export const Page: React.FC = () => {
                   estimateWidth={150}
                   className="w-full"
                 >
-                  {getCurrentFolderContent().map((file) => (
+                  {currentFolderContent.map((file) => (
                     <FolderContentExplorer.GridItem
                       key={file.id}
                       onDoubleClick={() => {
@@ -411,11 +409,10 @@ export const Page: React.FC = () => {
                 </Virtualizer.Grid>
               </ContextMenu.Trigger>
               <ContextMenu.Content className="w-48">
-                {getCurrentFolder() !== null ? (
+                {currentFolder !== null ? (
                   <>
                     <ContextMenu.Item inset
                       onClick={() => {
-                        const currentFolder = getCurrentFolder()
                         if (!currentFolder) {
                           return
                         }
@@ -454,7 +451,7 @@ export const Page: React.FC = () => {
           ) : null}
           {layout === 'list' ? (
             <Virtualizer.List className="h-full w-[750px]" estimateSize={50}>
-              {getCurrentFolderContent().map((file) => (
+              {currentFolderContent.map((file) => (
                 <FolderContentExplorer.ListItem
                   key={file.id}
                   onDoubleClick={() => {

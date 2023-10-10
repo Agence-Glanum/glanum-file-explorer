@@ -109,9 +109,10 @@ const List = ({className, estimateSize = 35, children, ...props}: ListProps) => 
     const parentRef = useRef(null)
 
     const rows = Array.isArray(children) ? children : [children]
+    const count = rows.length + 1
 
     const rowVirtualizer = useVirtualizer({
-        count: rows.length,
+        count,
         getScrollElement: () => parentRef.current,
         estimateSize: () => estimateSize,
         overscan: 5,
@@ -135,6 +136,10 @@ const List = ({className, estimateSize = 35, children, ...props}: ListProps) => 
             >
                 {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                     const row = rows[virtualRow.index]
+
+                    if (!row) {
+                        return null
+                    }
 
                     return (
                         <div
