@@ -1,4 +1,3 @@
-import type { InternalFile } from "../components/file-explorer/use-file-explorer";
 import * as Virtualizer from "../components/virtualizer/virtualizer";
 import * as FolderExplorer from "../components/folder-explorer/folder-explorer";
 import * as FolderContentExplorer from "../components/folder-content-explorer/folder-content-explorer";
@@ -8,6 +7,7 @@ import * as ContextMenu from "../components/context-menu/context-menu";
 import { ArchiveIcon, CrumpledPaperIcon, DashboardIcon, FileIcon, InputIcon, ListBulletIcon } from "@radix-ui/react-icons";
 import * as TogglePrimitive from "@radix-ui/react-toggle"
 import { useState } from "react";
+import { generateFolderData } from "../data/data";
 
 export const Page: React.FC = () => {
 
@@ -30,199 +30,8 @@ export const Page: React.FC = () => {
     rename,
     startRenaming
   } = useFileExplorer({
-      defaultFiles: {files: [{
-        id: "00001",
-        name: "00001",
-        sync: true,
-        type: "folder",
-        meta: {
-          parentDirId: "00000"
-        }
-      },
-      {
-        id: "00002",
-        name: "00002",
-        type: "folder",
-        sync: true,
-        meta: {
-          parentDirId: "00000"
-        }
-      },{
-        id: "00003",
-        name: "00003",
-        type: "folder",
-        sync: true,
-        meta: {
-          parentDirId: "00000"
-        }
-      },{
-        id: "00004",
-        name: "00004",
-        type: "folder",
-        sync: true,
-        meta: {
-          parentDirId: "00000"
-        }
-      },{
-        id: "00005",
-        name: "00005",
-        type: "folder",
-        sync: true,
-        meta: {
-          parentDirId: "00000"
-        }
-      },{
-        id: "00006",
-        name: "00006",
-        type: "folder",
-        sync: true,
-        meta: {
-          parentDirId: "00000"
-        }
-      },{
-        id: "00007",
-        name: "00007",
-        type: "folder",
-        sync: true,
-        meta: {
-          parentDirId: "00000"
-        }
-      },{
-        id: "00008",
-        name: "00008",
-        type: "folder",
-        sync: true,
-        meta: {
-          parentDirId: "00000"
-        }
-      },{
-        id: "00009",
-        name: "00009",
-        type: "folder",
-        sync: true,
-        meta: {
-          parentDirId: "00000"
-        }
-      }], 
-      id: "00000"
-    }
+      defaultFiles: generateFolderData()
   })
-
-
-
-  const data = (file: InternalFile) => {
-    if (file.id === "00001") {
-      updateFolder({
-        files: [
-          {
-            id: "00021",
-            name: "00021",
-            type: "folder",
-            sync: true,
-            meta: {
-              parentDirId: "00001"
-            }
-          },
-          {
-            id: "00011",
-            name: "00011",
-            type: "file",
-            sync: true,
-            meta: {
-              parentDirId: "00001"
-            }
-          }
-        ],
-        id: "00001"
-      })
-    }
-
-    if (file.id === "00021") {
-      updateFolder({
-        files: [
-          {
-            id: "00121",
-            name: "00121",
-            type: "folder",
-            sync: true,
-            meta: {
-              parentDirId: "00021"
-            }
-          },
-          {
-            id: "00221",
-            name: "00221",
-            type: "folder",
-            sync: true,
-            meta: {
-              parentDirId: "00021"
-            }
-          },
-          {
-            id: "00321",
-            name: "00321",
-            type: "folder",
-            sync: true,
-            meta: {
-              parentDirId: "00021"
-            }
-          },
-        ],
-        id: "00021"
-      })
-    }
-
-    if (file.id === "00321") {
-      updateFolder({
-        files: [
-          {
-            id: "01321",
-            name: "01321",
-            type: "folder",
-            sync: true,
-            meta: {
-              parentDirId: "00321"
-            }
-          },
-        ],
-        id: "00321"
-      })
-    }
-
-    if (file.id === "00121") {
-      updateFolder({
-        files: [
-          {
-            id: "01121",
-            name: "01121",
-            type: "file",
-            sync: true,
-            meta: {
-              parentDirId: "00121"
-            }
-          },
-        ],
-        id: "00121"
-      })
-    }
-
-    if (file.id === "00002") {
-      updateFolder({
-        files: [
-          {
-            id: "00012",
-            name: "00012",
-            type: "folder",
-            sync: true,
-            meta: {
-              parentDirId: "00002"
-            }
-          },
-        ],
-        id: "00002"
-      })
-    }
-  }
 
   return (
     <div className="flex p-4 h-screen bg-neutral-50">
@@ -237,7 +46,7 @@ export const Page: React.FC = () => {
                 <ContextMenu.Trigger asChild>
                   <FolderExplorer.Content
                     onDoubleClick={() => {
-                      data(folder)
+                      updateFolder(generateFolderData(folder.id))
                       openFolderFromTree(folder)
                     }}
                     onClick={() => {
@@ -250,7 +59,7 @@ export const Page: React.FC = () => {
                     <FolderExplorer.OpenIndicator
                       open={isFolderOpen(folder)}
                       onClick={() => {
-                        data(folder)
+                        updateFolder(generateFolderData(folder.id))
                         openFolderFromTree(folder)
                       }}
                     />
@@ -261,7 +70,7 @@ export const Page: React.FC = () => {
                   <ContextMenu.Content>
                     <ContextMenu.Item
                       onClick={() => {
-                        data(folder)
+                        updateFolder(generateFolderData(folder.id))
                         openFolderFromTree(folder)
                       }}
                     >
@@ -293,7 +102,7 @@ export const Page: React.FC = () => {
             </FolderExplorer.Item>
           ))}
       </Virtualizer.List>
-      <div className="px-4">
+      <div className="px-4 h-full">
         <div className="flex justify-between">
           <h3 className="text-xl font-semibold">{ currentFolder?.name }</h3>
           <div>
@@ -344,7 +153,7 @@ export const Page: React.FC = () => {
                       key={file.id}
                       onDoubleClick={() => {
                         if (file.type === "folder") {
-                          data(file)
+                          updateFolder(generateFolderData(file.id))
                           openFolder(file)
                         }
                       }}
@@ -388,7 +197,7 @@ export const Page: React.FC = () => {
                               <ContextMenu.Item
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  data(file)
+                                  updateFolder(generateFolderData(file.id))
                                   openFolder(file)
                                 }}
                               >
@@ -456,7 +265,7 @@ export const Page: React.FC = () => {
                   key={file.id}
                   onDoubleClick={() => {
                     if (file.type === "folder") {
-                      data(file)
+                      updateFolder(generateFolderData(file.id))
                       openFolder(file)
                     }
                   }}
