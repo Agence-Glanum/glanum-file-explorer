@@ -8,7 +8,6 @@ import { ArchiveIcon, CrumpledPaperIcon, DashboardIcon, FileIcon, InputIcon, Lis
 import * as TogglePrimitive from "@radix-ui/react-toggle"
 import { useState } from "react";
 import { generateFolderData } from "../data/data";
-
 export const Page: React.FC = () => {
 
   const [layout, setLayout] = useState<'list'|'grid'>('grid')
