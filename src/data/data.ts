@@ -1,8 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import { faker } from '@faker-js/faker';
+import { Folder, File } from '../components/file-explorer/use-file-explorer-v2';
 
-const generateFilesData = (parentFolderId: string) => {
-    return [...Array(100).keys()].map(() => {
+const generateFilesData = (parentFolderId: string): (File|Folder)[] => {
+    return [...Array(1000).keys()].map(() => {
 
         return faker.helpers.weightedArrayElement([
             {weight: 20, value: {
@@ -10,10 +11,7 @@ const generateFilesData = (parentFolderId: string) => {
                 name: faker.system.commonFileName(),
                 type: 'folder',
                 path: [{id: "", name: ""}],
-                root: faker.helpers.weightedArrayElement([
-                    {weight: 20, value: false}, 
-                    {weight: 80, value: true}
-                ]),
+                root: false,
                 sync: true,
                 meta: {
                     parentDirId: parentFolderId
@@ -43,29 +41,36 @@ const generateFolderData = (parentFolderId?: string) => {
 type GenerateFolder = {
     folderId?: string 
     parentFolderId?: string
-    child?: Object
+    child?: File|Folder
+    baseFolder?: any
+    canRoot?: boolean
 }
 
-const generateFolder = ({folderId, parentFolderId, child}: GenerateFolder) => {
+const generateFolder = ({folderId, parentFolderId, child, baseFolder, canRoot = false}: GenerateFolder) => {
     const id = folderId ?? uuidv4()
     const parentId = parentFolderId ?? uuidv4()
 
     const files = child ? [child, ...generateFilesData(id)] : generateFilesData(id)
 
+    const root = canRoot ? faker.helpers.weightedArrayElement([
+                {weight: 20, value: true}, 
+                {weight: 80, value: false}
+            ]) : false
+
     return {
-        id: id,
-        name: faker.system.commonFileName(),
-        type: 'folder',
-        path: [{id: "", name: ""}],
-        root: faker.helpers.weightedArrayElement([
-            {weight: 20, value: false}, 
-            {weight: 80, value: true}
-        ]),
-        sync: true,
-        files,
-        meta: {
-            parentDirId: parentId
-        }
+        ...{
+            id: id,
+            name: faker.system.commonFileName(),
+            type: 'folder',
+            path: [{id: "", name: ""}],
+            root,
+            sync: true,
+            files,
+            meta: {
+                parentDirId: parentId
+            }
+        },
+        ...baseFolder
     }
 }
 

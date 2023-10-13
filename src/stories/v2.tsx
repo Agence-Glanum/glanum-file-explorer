@@ -4,6 +4,8 @@ import { useFileExplorerV2 } from "../components/file-explorer/use-file-explorer
 import * as FolderContentExplorer from "../components/folder-content-explorer/folder-content-explorer";
 import * as Virtualizer from "../components/virtualizer/virtualizer";
 import { generateFolder } from "../data/data";
+import { useFolderExplorerV2 } from "../components/folder-explorer/use-folder-explorer-v2";
+import * as FolderExplorer from "../components/folder-explorer/folder-explorer";
 
 export const V2: React.FC = () => {
 
@@ -11,27 +13,107 @@ export const V2: React.FC = () => {
         currentFolder,
         currentFolderContent,
         openFolder,
-        updateFolder
+        updateFolder,
+        clickFolder,
+        store
     } = useFileExplorerV2({
-        defaultFolder: generateFolder({})
+        defaultFolder: generateFolder({canRoot: true})
     })
+
+    const { folders } = useFolderExplorerV2({ store })
     
     return (
-        <>
-            {currentFolder?.root ? (
-                 <button
-                    onClick={() => {
-                        updateFolder(
-                            currentFolder.meta?.parentDirId,
-                            generateFolder({
-                               folderId: currentFolder.meta?.parentDirId,
-                               child: currentFolder
-                            })
-                        )
-                        openFolder(currentFolder.meta?.parentDirId)
-                    }}
-                >Back</button>
-            ): null}
+        <div className="flex p-4 h-screen bg-neutral-50">
+            <Virtualizer.List className="h-full border-r border-gray-300" estimateSize={32}>
+                {folders().map((folder) =>(
+                <FolderExplorer.Item
+                    key={folder.id}
+                    className="h-[32px]"
+                >
+                    <FolderExplorer.DepthIndicator depth={folder.depth} offset={7}/>
+                    <ContextMenu.Root>
+                    <ContextMenu.Trigger asChild>
+                        <FolderExplorer.Content
+                        onDoubleClick={() => {
+                            // updateFolder(generateFolderData(folder.id))
+                            // openFolderFromTree(folder)
+                        }}
+                        onClick={() => {
+                            clickFolder(folder.id)
+                        }}
+                        depth={folder.depth}
+                        className="text-gray-800"
+                        title={folder.name}
+                        >
+                        {/* <FolderExplorer.OpenIndicator
+                            open={isFolderOpen(folder)}
+                            onClick={() => {
+                            // updateFolder(generateFolderData(folder.id))
+                            // openFolderFromTree(folder)
+                            }}
+                        /> */}
+                        <ArchiveIcon className="ml-1" />
+                        <span className="ml-2 max-w-[75px] truncate">{folder.name}</span>
+                        </FolderExplorer.Content>  
+                    </ContextMenu.Trigger>
+                        <ContextMenu.Content>
+                        <ContextMenu.Item
+                            onClick={() => {
+                            // updateFolder(generateFolderData(folder.id))
+                            // openFolderFromTree(folder)
+                            }}
+                        >
+                            {/* {isFolderOpen(folder) ? "Close" : "Open"} */}
+                        </ContextMenu.Item>
+                        {/* {isFolderOpen(folder) ? (
+                            <ContextMenu.Item
+                            onClick={() => {
+                                const newfolder = createTempFolder(folder)
+    
+                                if (!newfolder) {
+                                return
+                                }
+    
+                                setTimeout(() => {
+                                updateFile({
+                                    ...newfolder, 
+                                    sync: true,
+                                    meta: {...newfolder.meta, oldId: newfolder.id}
+                                })
+                                }, 3000)
+                            }}
+                            >
+                            Create folder
+                            </ContextMenu.Item>
+                        ) : null} */}
+                        </ContextMenu.Content>
+                    </ContextMenu.Root>
+                </FolderExplorer.Item>
+                ))}
+            </Virtualizer.List>
+            <div className="px-4 h-full">
+            <div className="flex justify-between">
+                <h3 className="text-xl font-semibold">{ currentFolder?.name }</h3>
+                <div>
+                    {!currentFolder?.root ? (
+                        <button
+                            onClick={() => {
+                                updateFolder(
+                                    currentFolder.meta?.parentDirId,
+                                    generateFolder({
+                                    folderId: currentFolder.meta?.parentDirId,
+                                    child: currentFolder,
+                                    canRoot: true
+                                    })
+                                )
+                                openFolder(currentFolder.meta?.parentDirId)
+                            }}
+                        >Back</button>
+                    ): null}
+                </div>
+                
+            </div>
+            
            
             <ContextMenu.Root>
                 <ContextMenu.Trigger>
@@ -94,7 +176,10 @@ export const V2: React.FC = () => {
                                         e.stopPropagation()
                                         updateFolder(file.id, generateFolder({
                                             folderId: file.id, 
-                                            parentFolderId: file.meta?.parentDirId
+                                            parentFolderId: file.meta?.parentDirId,
+                                            baseFolder: {
+                                                name: file.name
+                                            }
                                         }))
                                         openFolder(file.id)
                                     }}
@@ -155,6 +240,7 @@ export const V2: React.FC = () => {
                 <ContextMenu.CheckboxItem>Show list</ContextMenu.CheckboxItem>
                 </ContextMenu.Content>
             </ContextMenu.Root>
-        </>
+        </div>
+    </div>
     )
 }

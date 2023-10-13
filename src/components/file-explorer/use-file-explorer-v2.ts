@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import HashTable from "../../utils/hash-table"
 import { produce } from "immer"
 
-type File = {
+export type File = {
     id: string
     type: string
     name: string
@@ -15,7 +15,7 @@ type File = {
     }
 }
 
-interface Folder extends File {
+export interface Folder extends File {
     type: string
     path: Array<{
         id: string
@@ -24,7 +24,7 @@ interface Folder extends File {
     root: boolean
 }
 
-interface FolderFiles extends Folder {
+export interface FolderFiles extends Folder {
     files: Array<File>
 }
 
@@ -53,14 +53,14 @@ const convertToInternalFiles = (files: File[]) => {
 }
 
 export function useFileExplorerV2({defaultFolder}: Props) {
-    const [store, setStore] = useState(new HashTable(50))
+    const [store, setStore] = useState<Array<Folder>>([])
     const [currentFolderId, setCurrentFolderId] = useState<string|null>(null)
     const [openFolders, setOpenFolders] = useState<Array<string>>([])
     const [selectedFiles, setSelectedFiles] = useState<Array<InternalFile>>([])
 
     useEffect(() => {
         setStore(produce((store) => {
-            store.set(defaultFolder.id, defaultFolder)
+            store.push(defaultFolder)
         }))
         setCurrentFolderId(defaultFolder.id)
         setOpenFolders([defaultFolder.id])
@@ -89,18 +89,35 @@ export function useFileExplorerV2({defaultFolder}: Props) {
     }
 
     const updateFolder = (folderId: string, updatedFolder: FolderFiles) => {
-        console.log(folderId)
-
-       
         setStore(produce((store) => {
-            if (store.has(folderId)) {
+            if (store.find(((folder) => folder.id === folderId))) {
                 return 
             }
-            store.set(folderId, updatedFolder)
+
+            const childIndex = store.findIndex((folder) => folder.id === updatedFolder.meta?.parentDirId)
+
+            if (childIndex !== -1) {
+                store.splice(childIndex + 1, 0, updatedFolder)
+                return
+            }
+
+            const parentIndex = store.findIndex((folder) => folder.meta?.parentDirId === updatedFolder.id)
+
+            if (parentIndex !== -1) {
+                store.splice(parentIndex - 1, 0, updatedFolder)
+                return
+            }
+
+            store.push(updatedFolder)
         }))
     }
 
-    const currentFolder = store.has(currentFolderId) ? store.get(currentFolderId) : null
+    const clickFolder = (folderId: string) => {
+        setSelectedFiles([])
+        setCurrentFolderId(folderId)
+    }
+
+    const currentFolder = store.find(((folder) => folder.id === currentFolderId)) ?? null
 
     const currentFolderContent = currentFolder ? (currentFolder as FolderFiles).files ?? [] : []
 
@@ -108,6 +125,8 @@ export function useFileExplorerV2({defaultFolder}: Props) {
         currentFolder,
         currentFolderContent,
         openFolder,
-        updateFolder
+        updateFolder,
+        clickFolder,
+        store
     }
 }
