@@ -6,21 +6,27 @@ import * as Virtualizer from "../components/virtualizer/virtualizer";
 import { generateFolder } from "../data/data";
 import { useFolderExplorerV2 } from "../components/folder-explorer/use-folder-explorer-v2";
 import * as FolderExplorer from "../components/folder-explorer/folder-explorer";
+import clsx from "clsx";
 
 export const V2: React.FC = () => {
 
     const {
         currentFolder,
         currentFolderContent,
-        openFolder,
         updateFolder,
-        clickFolder,
+        focusFolder,
         store
     } = useFileExplorerV2({
         defaultFolder: generateFolder({canRoot: true})
     })
 
-    const { folders } = useFolderExplorerV2({ store })
+    const {
+        folders,
+        selectFolder,
+        isFolderSelected,
+        toggleOpenFolder,
+        isFolderOpen
+    } = useFolderExplorerV2({ store })
     
     return (
         <div className="flex p-4 h-screen bg-neutral-50">
@@ -34,26 +40,31 @@ export const V2: React.FC = () => {
                     <ContextMenu.Root>
                     <ContextMenu.Trigger asChild>
                         <FolderExplorer.Content
-                        onDoubleClick={() => {
-                            // updateFolder(generateFolderData(folder.id))
-                            // openFolderFromTree(folder)
-                        }}
-                        onClick={() => {
-                            clickFolder(folder.id)
-                        }}
-                        depth={folder.depth}
-                        className="text-gray-800"
-                        title={folder.name}
-                        >
-                        {/* <FolderExplorer.OpenIndicator
-                            open={isFolderOpen(folder)}
-                            onClick={() => {
-                            // updateFolder(generateFolderData(folder.id))
-                            // openFolderFromTree(folder)
+                            onDoubleClick={() => {
+                                // updateFolder(generateFolderData(folder.id))
+                                // openFolderFromTree(folder)
+                                toggleOpenFolder(folder.id)
+                                selectFolder(folder.id)
                             }}
-                        /> */}
-                        <ArchiveIcon className="ml-1" />
-                        <span className="ml-2 max-w-[75px] truncate">{folder.name}</span>
+                            onClick={() => {
+                                focusFolder(folder.id)
+                                selectFolder(folder.id)
+                            }}
+                            depth={folder.depth}
+                            className={clsx(
+                                isFolderSelected(folder.id) && "bg-gray-100 rounded-md focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-600",
+                                "text-gray-800"
+                            )}
+                            title={folder.name}
+                        >
+                            <FolderExplorer.OpenIndicator
+                                open={isFolderOpen(folder.id)}
+                                onClick={() => {
+                                    toggleOpenFolder(folder.id)
+                                }}
+                            />
+                            <ArchiveIcon className="ml-1" />
+                            <span className="ml-2 max-w-[75px] truncate">{folder.name}</span>
                         </FolderExplorer.Content>  
                     </ContextMenu.Trigger>
                         <ContextMenu.Content>
@@ -97,7 +108,7 @@ export const V2: React.FC = () => {
                 <div>
                     {!currentFolder?.root ? (
                         <button
-                            onClick={() => {
+                            onClick={async () => {
                                 updateFolder(
                                     currentFolder.meta?.parentDirId,
                                     generateFolder({
@@ -106,7 +117,6 @@ export const V2: React.FC = () => {
                                     canRoot: true
                                     })
                                 )
-                                openFolder(currentFolder.meta?.parentDirId)
                             }}
                         >Back</button>
                     ): null}
@@ -131,7 +141,6 @@ export const V2: React.FC = () => {
                                     folderId: file.id, 
                                     parentFolderId: file.meta?.parentDirId
                                 }))
-                                openFolder(file.id)
                             }
                             }}
                             onClick={(e) => {
@@ -181,7 +190,8 @@ export const V2: React.FC = () => {
                                                 name: file.name
                                             }
                                         }))
-                                        openFolder(file.id)
+                                        selectFolder(file.id)
+                                        toggleOpenFolder(file.id)
                                     }}
                                     >
                                     Open

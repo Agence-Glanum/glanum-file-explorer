@@ -55,7 +55,6 @@ const convertToInternalFiles = (files: File[]) => {
 export function useFileExplorerV2({defaultFolder}: Props) {
     const [store, setStore] = useState<Array<Folder>>([])
     const [currentFolderId, setCurrentFolderId] = useState<string|null>(null)
-    const [openFolders, setOpenFolders] = useState<Array<string>>([])
     const [selectedFiles, setSelectedFiles] = useState<Array<InternalFile>>([])
 
     useEffect(() => {
@@ -63,32 +62,15 @@ export function useFileExplorerV2({defaultFolder}: Props) {
             store.push(defaultFolder)
         }))
         setCurrentFolderId(defaultFolder.id)
-        setOpenFolders([defaultFolder.id])
     }, [])
 
-    const openFolder = (id: string) => {
-        // setOpenFolders(produce((draft) => {
-        //     const index = draft.indexOf(folder.id)
 
-        //     if(index === -1) {
-        //         draft.push(folder.id)
-        //     }
-
-        //     const parentFolder = folder.meta?.parentDirId ? store.get(folder.meta?.parentDirId) : null
-
-        //     if (parentFolder) {
-        //         const index = draft.indexOf(parentFolder.id)
-
-        //         if(index === -1) {
-        //             draft.push(parentFolder.id)
-        //         }
-        //     }
-        // }))
-        // setSelectedFiles([])
-        setCurrentFolderId(id)
+    const focusFolder = async (folderId: string) => {
+        setSelectedFiles([])
+        setCurrentFolderId(folderId)
     }
 
-    const updateFolder = (folderId: string, updatedFolder: FolderFiles) => {
+    const updateFolder = async (folderId: string, updatedFolder: FolderFiles) => {
         setStore(produce((store) => {
             if (store.find(((folder) => folder.id === folderId))) {
                 return 
@@ -110,12 +92,9 @@ export function useFileExplorerV2({defaultFolder}: Props) {
 
             store.push(updatedFolder)
         }))
+        await focusFolder(folderId)
     }
 
-    const clickFolder = (folderId: string) => {
-        setSelectedFiles([])
-        setCurrentFolderId(folderId)
-    }
 
     const currentFolder = store.find(((folder) => folder.id === currentFolderId)) ?? null
 
@@ -124,9 +103,8 @@ export function useFileExplorerV2({defaultFolder}: Props) {
     return {
         currentFolder,
         currentFolderContent,
-        openFolder,
         updateFolder,
-        clickFolder,
+        focusFolder,
         store
     }
 }
