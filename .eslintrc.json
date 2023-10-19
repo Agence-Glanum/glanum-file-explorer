@@ -21,8 +21,9 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "react/no-unescaped-entities":"warn",
         "@typescript-eslint/no-empty-interface": "warn",
-        "react/no-unescaped-entities":"warn"
+        "@typescript-eslint/no-explicit-any": "warn"
     },
     "settings": {
         "react": {
