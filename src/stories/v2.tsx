@@ -25,7 +25,8 @@ export const V2: React.FC = () => {
         selectFolder,
         isFolderSelected,
         toggleOpenFolder,
-        isFolderOpen
+        isFolderOpen,
+        openFolder
     } = useFolderExplorerV2({ store })
     
     return (
@@ -41,8 +42,13 @@ export const V2: React.FC = () => {
                     <ContextMenu.Trigger asChild>
                         <FolderExplorer.Content
                             onDoubleClick={() => {
-                                // updateFolder(generateFolderData(folder.id))
-                                // openFolderFromTree(folder)
+                                updateFolder(folder.id, generateFolder({
+                                    folderId: folder.id, 
+                                    parentFolderId: folder.parent[folder.parent.length - 1],
+                                    baseFolder: {
+                                        name: folder.name
+                                    }
+                                }))
                                 toggleOpenFolder(folder.id)
                                 selectFolder(folder.id)
                             }}
@@ -60,21 +66,36 @@ export const V2: React.FC = () => {
                             <FolderExplorer.OpenIndicator
                                 open={isFolderOpen(folder.id)}
                                 onClick={() => {
+                                    updateFolder(folder.id, generateFolder({
+                                        folderId: folder.id, 
+                                        parentFolderId: folder.parent[folder.parent.length - 1],
+                                        baseFolder: {
+                                            name: folder.name
+                                        }
+                                    }))
+                                    selectFolder(folder.id)
                                     toggleOpenFolder(folder.id)
                                 }}
                             />
                             <ArchiveIcon className="ml-1" />
-                            <span className="ml-2 max-w-[75px] truncate">{folder.name}</span>
+                            <span className="ml-2 max-w-[75px] truncate">{folder.id}</span>
                         </FolderExplorer.Content>  
                     </ContextMenu.Trigger>
                         <ContextMenu.Content>
                         <ContextMenu.Item
                             onClick={() => {
-                            // updateFolder(generateFolderData(folder.id))
-                            // openFolderFromTree(folder)
+                                updateFolder(folder.id, generateFolder({
+                                    folderId: folder.id, 
+                                    parentFolderId: folder.parent[folder.parent.length - 1],
+                                    baseFolder: {
+                                        name: folder.name
+                                    }
+                                }))
+                                toggleOpenFolder(folder.id)
+                                selectFolder(folder.id)
                             }}
                         >
-                            {/* {isFolderOpen(folder) ? "Close" : "Open"} */}
+                            {isFolderOpen(folder.id) ? "Close" : "Open"}
                         </ContextMenu.Item>
                         {/* {isFolderOpen(folder) ? (
                             <ContextMenu.Item
@@ -109,14 +130,15 @@ export const V2: React.FC = () => {
                     {!currentFolder?.root ? (
                         <button
                             onClick={async () => {
-                                updateFolder(
-                                    currentFolder.meta?.parentDirId,
-                                    generateFolder({
-                                    folderId: currentFolder.meta?.parentDirId,
-                                    child: currentFolder,
+                                const folder = generateFolder({
+                                    folderId: currentFolder?.meta?.parentDirId,
+                                    child: currentFolder ?? undefined,
                                     canRoot: true
-                                    })
-                                )
+                                })
+
+                                updateFolder(folder.id, folder)
+                                selectFolder(folder.id)
+                                openFolder(folder?.meta?.parentDirId ?? "")
                             }}
                         >Back</button>
                     ): null}
@@ -139,8 +161,13 @@ export const V2: React.FC = () => {
                             if (file.type === "folder") {
                                 updateFolder(file.id, generateFolder({
                                     folderId: file.id, 
-                                    parentFolderId: file.meta?.parentDirId
+                                    parentFolderId: file.meta?.parentDirId,
+                                    baseFolder: {
+                                        name: file.name
+                                    }
                                 }))
+                                selectFolder(file.id)
+                                toggleOpenFolder(file.id)   
                             }
                             }}
                             onClick={(e) => {
@@ -172,7 +199,7 @@ export const V2: React.FC = () => {
                                     />
                                 ): (
                                     <div className="font-semibold max-w-[120px] truncate">
-                                        {file.name}
+                                        {file.id}
                                     </div>
                                 )}
                                 

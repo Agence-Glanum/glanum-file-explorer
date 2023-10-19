@@ -1,4 +1,3 @@
-import { produce } from "immer"
 import { FolderFiles } from "../file-explorer/use-file-explorer-v2"
 import { useEffect, useState } from "react"
 
@@ -7,69 +6,102 @@ type FolderExplorerV2Props = {
 }
 
 export function useFolderExplorerV2({store}: FolderExplorerV2Props) {
-
-
     const [selectedFolder, setSelectedFolder] = useState<Array<string>>([])
     const [openFolders, setOpenFolders] = useState<Array<string>>([])
     const [first, setFirst] = useState(false)
 
     useEffect(() => {
         if (!first) {
-            const value = store.length !== 0 ? [store[0].id] : []
-            setSelectedFolder(value)
-            setOpenFolders(value)
+            setSelectedFolder(store.length !== 0 ? [store[0].meta?.parentDirId ?? ""] : [])
+            setOpenFolders(store.length !== 0 ? [store[0].id, store[0].meta?.parentDirId ?? ""] : [])
             setFirst(store.length !== 0)
         }
     }, [store])
 
     const folders = () => {
 
-        const arry: Array<{id: string, name: string, depth: number}> = []
+        const draft: Array<{id: string, name: string, parent: Array<string>, depth: number}> = []
+        
+        let openedFolders = [...openFolders]
+        let depth = 0
 
-        const result = produce(arry, (draft) => {
+        for(let i = 0; i < store.length; ++i) {
+            const folder = store[i]
+        
+            if (depth === 0) {
+                const parentDirId = folder.meta?.parentDirId ?? ""
 
-            let depth = 0
+                draft.push({
+                    id: folder.id,
+                    name: folder.name, 
+                    parent: [parentDirId], 
+                    depth
+                })
 
-            store.forEach((folder) => {
-
-                const folderIndex = draft.findIndex((f) => f.id === folder.id)
-
-                if (folderIndex === -1) {
-                    draft.push({id: folder.id, name: folder.name,  depth})
+                if (!openedFolders.includes(parentDirId)) {
+                    openedFolders.push(parentDirId)
                 }
 
-                depth++
-console.log(openFolders)
-                if (openFolders.includes(folder.id ?? "")) {
-                    folder
-                        .files
-                        .filter((file) => file.type === 'folder')
-                        .forEach((subfolder) => {
-
-                            if (folderIndex !== -1) {
-                                draft.splice(folderIndex + 1, 0, {id: subfolder.id, name: subfolder.name, depth})
-                            } else {
-                                draft.push({id: subfolder.id, name: subfolder.name, depth})
-                            }
-                            
-                        })
+                if (!openedFolders.includes(folder.id)) {
+                    openedFolders.push(folder.id)
                 }
-            })
+            }
 
+            depth++
 
-        })
-        console.log(result)
-        return result
+            let folderIndex = draft.findIndex((f) => f.id === folder.id)
+
+            const parentFolder = draft[folderIndex]
+
+            if (!parentFolder) {
+                continue
+            }
+
+            let amountFolder = 1
+
+            const folders = folder
+                .files
+                .filter((file) => file.type === 'folder')
+
+            const folderDepth = parentFolder.depth + 1 
+
+            for(let y = 0; y < folders.length; ++y) {
+                const subfolder = folders[y]
+
+                const parent = parentFolder.parent ? 
+                    [...parentFolder.parent, folder.id] :
+                    [folder.id]
+console.log(parent, openedFolders)
+                if (!parent.every((openFolder) => openedFolders.includes(openFolder))) {
+                    continue
+                }
+
+                if (folderIndex !== -1) {
+                    draft.splice(folderIndex + amountFolder, 0, {
+                        id: subfolder.id, 
+                        name: subfolder.name, 
+                        parent, 
+                        depth: folderDepth
+                    })
+                } else {
+                    draft.push({
+                        id: subfolder.id,
+                        name: subfolder.name,
+                        parent, 
+                        depth: folderDepth
+                    })
+                }
+
+                amountFolder++
+            }
+            
+        }
+
+        return draft
     }
 
     const selectFolder = (folderId: string) => {
-        setSelectedFolder((state) => {
-            if (state.includes(folderId)) {
-                return state
-            }
-            return [...state, folderId]
-           
-        })
+        setSelectedFolder([folderId])
     }
 
     const isFolderSelected = (folderId: string) => {
@@ -84,6 +116,16 @@ console.log(openFolders)
         })
     }
 
+    const openFolder = (folderId: string) => {
+        setSelectedFolder((state) => {
+            if (state.includes(folderId)) {
+                return state
+            }
+
+            return [...state, folderId]
+        })
+    }
+
     const isFolderOpen = (folderId: string) => {
         return openFolders.includes(folderId)
     } 
@@ -93,6 +135,7 @@ console.log(openFolders)
         selectFolder,
         isFolderSelected,
         isFolderOpen,
-        toggleOpenFolder
+        toggleOpenFolder,
+        openFolder,
     }
 }

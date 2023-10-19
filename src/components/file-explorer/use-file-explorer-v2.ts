@@ -86,6 +86,10 @@ export function useFileExplorerV2({defaultFolder}: Props) {
             const parentIndex = store.findIndex((folder) => folder.meta?.parentDirId === updatedFolder.id)
 
             if (parentIndex !== -1) {
+                if (parentIndex === 0) {
+                    store.splice(0, 0, updatedFolder)
+                    return
+                }
                 store.splice(parentIndex - 1, 0, updatedFolder)
                 return
             }

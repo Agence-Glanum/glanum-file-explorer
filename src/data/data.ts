@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker';
 import { Folder, File } from '../components/file-explorer/use-file-explorer-v2';
 
 const generateFilesData = (parentFolderId: string): (File|Folder)[] => {
-    return [...Array(1000).keys()].map(() => {
+    return [...Array(20).keys()].map(() => {
 
         return faker.helpers.weightedArrayElement([
             {weight: 20, value: {
@@ -59,7 +59,7 @@ const generateFolder = ({folderId, parentFolderId, child, baseFolder, canRoot = 
 
     return {
         ...{
-            id: id,
+            id,
             name: faker.system.commonFileName(),
             type: 'folder',
             path: [{id: "", name: ""}],
