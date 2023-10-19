@@ -1,17 +1,15 @@
-import "./styles.css"
-
 import * as ContextMenu from "@radix-ui/react-context-menu";
 
-import { CheckIcon, DotFilledIcon } from "@radix-ui/react-icons";
-import { ContextMenuProps, Item } from "./types/context-menu-type";
+import { ContextMenuProps, Item } from "../../types/context-menu-type";
 
-import useCheckbox from "./hooks/useCheckbox";
-import useRadio from "./hooks/useRadio";
+import CheckboxItem from "../common/checkbox-item";
+import DefaultItem from "../common/default-item";
+import RadioItem from "../common/radio-item";
+import { useContextMenuStore } from "../../store/context-menu";
 
-function ContextMenuComponent({ data, TriggerComponent }: ContextMenuProps) {
-  const [radioValue, setRadioValue] = useRadio("slot 1");
-  const [checked, handleCheckbox] = useCheckbox(false);
-  
+function ContextMenuComponent({ data: mock, TriggerComponent }: ContextMenuProps) {
+  const itemsState = useContextMenuStore((state) => state.items)
+
   return (
     <ContextMenu.Root>
       <ContextMenu.Trigger className="ContextMenuTrigger">
@@ -23,69 +21,13 @@ function ContextMenuComponent({ data, TriggerComponent }: ContextMenuProps) {
           sideOffset={5}
           align="end"
         >
-          {data?.map((item: Item) => {
+          {mock?.map((item: Item, index: number) => {
             if (item.isItem) {
-              return (
-                <>
-                  <ContextMenu.Item
-                    key={item.name}
-                    disabled={item.disabled}
-                    onClick={item.onclick}
-                    className="ContextMenuItem"
-                  >
-                    {item.name} <div className="RightSlot">{item.shortcut}</div>
-                  </ContextMenu.Item>
-                  {item.isSeparated ? <ContextMenu.Separator className="ContextMenuSeparator" /> : null }
-                </>
-                
-                
-              )
+              return <DefaultItem key={item.name} item={item} index={index} state={itemsState[index]} />
             } else if (item.isCheckbox) {
-              return (
-                <>
-                  <ContextMenu.CheckboxItem
-                    className="ContextMenuCheckboxItem"
-                    checked={checked}
-                    onCheckedChange={handleCheckbox}
-                  >
-                    <ContextMenu.ItemIndicator className="ContextMenuItemIndicator">
-                      <CheckIcon />
-                    </ContextMenu.ItemIndicator>
-                    {item.name}
-                  </ContextMenu.CheckboxItem>
-                  {item.isSeparated ? <ContextMenu.Separator className="ContextMenuSeparator" /> : null }
-                </>
-              )
+              return <CheckboxItem key={item.name} item={item} index={index} state={itemsState[index]} />
             } else if (item.isRadio) {
-              return (
-                <>
-                  <ContextMenu.Label className="ContextMenuLabel">
-                    {item.radioGroupName}
-                  </ContextMenu.Label>
-                  <ContextMenu.RadioGroup
-                    value={radioValue}
-                    onValueChange={(e) => {
-                      setRadioValue(e)
-                    }}
-                  >
-                    {item.radioEntries?.map((entry) => {
-                      return (
-                        <ContextMenu.RadioItem
-                          className="ContextMenuRadioItem"
-                          value={entry}
-                          key={entry}
-                        >
-                          <ContextMenu.ItemIndicator className="ContextMenuItemIndicator">
-                            <DotFilledIcon />
-                          </ContextMenu.ItemIndicator>
-                          {entry}
-                        </ContextMenu.RadioItem>
-                      )
-                    })}
-                  </ContextMenu.RadioGroup>
-                  {item.isSeparated ? <ContextMenu.Separator className="ContextMenuSeparator" /> : null }
-                </>
-              ) 
+              return <RadioItem key={item.name} item={item} index={index} state={itemsState[index]} />
             }
           })}
         </ContextMenu.Content>
