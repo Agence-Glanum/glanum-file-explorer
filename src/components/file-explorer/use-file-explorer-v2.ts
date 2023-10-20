@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import HashTable from "../../utils/hash-table"
 import { produce } from "immer"
+import { v4 } from "uuid"
 
 export type File = {
     id: string
@@ -15,6 +16,10 @@ export type File = {
     }
 }
 
+export interface InternalFile extends File {
+    renaming: boolean
+}
+
 export interface Folder extends File {
     type: string
     path: Array<{
@@ -25,7 +30,7 @@ export interface Folder extends File {
 }
 
 export interface FolderFiles extends Folder {
-    files: Array<File>
+    files: Array<InternalFile>
 }
 
 type Props = {
@@ -33,33 +38,26 @@ type Props = {
 }
 
 
-export interface InternalFile extends File {
-    children?: InternalFile[]
-    renaming: boolean
-}
 
-const convertToInternalFiles = (files: File[]) => {
-    return files.map((file) => {
-        if (file.type !== "folder") {
+
+const convertToInternalFiles = (folder: FolderFiles) => {
+    return {
+        ...folder,
+        files: folder.files.map((file) => {
             return {...file, renaming: false}
-        }
-
-        return {
-            ...file,
-            children: [],
-            renaming: false
-        }
-    })
+        })
+    }
 }
 
 export function useFileExplorerV2({defaultFolder}: Props) {
-    const [store, setStore] = useState<Array<Folder>>([])
+    const [store, setStore] = useState<Array<FolderFiles>>([])
     const [currentFolderId, setCurrentFolderId] = useState<string|null>(null)
     const [selectedFiles, setSelectedFiles] = useState<Array<InternalFile>>([])
+    const [renaming, setRenaming] = useState<InternalFile|null>(null)
 
     useEffect(() => {
         setStore(produce((store) => {
-            store.push(defaultFolder)
+            store.push(convertToInternalFiles(defaultFolder))
         }))
         setCurrentFolderId(defaultFolder.id)
     }, [])
@@ -79,7 +77,7 @@ export function useFileExplorerV2({defaultFolder}: Props) {
             const childIndex = store.findIndex((folder) => folder.id === updatedFolder.meta?.parentDirId)
 
             if (childIndex !== -1) {
-                store.splice(childIndex + 1, 0, updatedFolder)
+                store.splice(childIndex + 1, 0, convertToInternalFiles(updatedFolder))
                 return
             }
 
@@ -90,15 +88,108 @@ export function useFileExplorerV2({defaultFolder}: Props) {
                     store.splice(0, 0, updatedFolder)
                     return
                 }
-                store.splice(parentIndex - 1, 0, updatedFolder)
+                store.splice(parentIndex - 1, 0, convertToInternalFiles(updatedFolder))
                 return
             }
 
-            store.push(updatedFolder)
+            store.push(convertToInternalFiles(updatedFolder))
         }))
         await focusFolder(folderId)
     }
 
+    const selectFile = (file: InternalFile|InternalFile[]) => {
+        const files = Array.isArray(file) ? file : [file]
+
+        setSelectedFiles(files)
+    }
+
+    const updateFile = (file: InternalFile) => {
+        setStore(produce((draft) => {
+            const id = file.meta?.oldId ?? file.id
+
+            const foundFolder = draft.find((folder) => folder.id === file.meta?.parentDirId)
+
+            if (!foundFolder) {
+                return
+            }
+
+            const foundFile = foundFolder.files.find((file) => file.id === id)
+            
+            if (foundFile) {
+                Object.assign(foundFile, file)
+            }
+        }))
+    }
+
+    const startRenaming = (file: InternalFile) => {
+        if (renaming !== null) {
+            return
+        }
+
+        updateFile({...file, renaming: true})
+        setRenaming(file)
+    }
+
+    const rename = (file: InternalFile) => {
+        if (!file.renaming) {
+            return
+        }
+
+        updateFile({...file, renaming: false})
+        setRenaming(null)
+        selectFile(file)
+    }
+
+    const createTempFile = (
+        parentFolderId: string,
+        defaultFile?: InternalFile
+    ) => {
+        const parentFolder = store.find((folder) => folder.id === parentFolderId)
+
+        if (!parentFolder) {
+            return
+        }
+
+        if (!parentFolder.sync) {
+            return
+        }
+
+        const newFile = {
+            id: v4(),
+            type: defaultFile?.type ?? 'file',
+            name: defaultFile?.name ?? 'New File',
+            sync: defaultFile?.sync ?? false,
+            renaming: defaultFile?.renaming ?? false,
+            ...(defaultFile ?? {}),
+            meta: {
+                parentDirId: parentFolder.id,
+                ...(defaultFile?.meta ?? {})
+            },
+            
+        }
+
+        setStore(produce((draft) => {
+            const foundFolder = draft.find((folder) => folder.id === parentFolder.id)
+
+            if (!foundFolder) {
+                return
+            }
+
+            foundFolder.files.push(newFile)     
+        }))
+
+
+        return newFile
+    }
+
+    const createTempFolder = (parentFolder: string, defaultFolder?: InternalFile) => {
+        return createTempFile(
+            parentFolder, {
+            name:  "New Folder",
+            ...(defaultFolder ?? {}),
+            type: 'folder'
+         })
+    }
 
     const currentFolder = store.find(((folder) => folder.id === currentFolderId)) ?? null
 
@@ -109,6 +200,11 @@ export function useFileExplorerV2({defaultFolder}: Props) {
         currentFolderContent,
         updateFolder,
         focusFolder,
-        store
+        store,
+        updateFile,
+        startRenaming,
+        rename,
+        createTempFolder,
+        createTempFile
     }
 }

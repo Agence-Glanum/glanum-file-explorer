@@ -11,10 +11,12 @@ export function useFolderExplorerV2({store}: FolderExplorerV2Props) {
     const [first, setFirst] = useState(false)
 
     useEffect(() => {
-        if (!first) {
-            setSelectedFolder(store.length !== 0 ? [store[0].meta?.parentDirId ?? ""] : [])
-            setOpenFolders(store.length !== 0 ? [store[0].id, store[0].meta?.parentDirId ?? ""] : [])
-            setFirst(store.length !== 0)
+        if (!first && store.length !== 0) {
+            const parentDirId = store[0].meta?.parentDirId ?? ""
+
+            setSelectedFolder([store[0].id])
+            setOpenFolders([store[0].id, parentDirId])
+            setFirst(true)
         }
     }, [store])
 
@@ -22,29 +24,18 @@ export function useFolderExplorerV2({store}: FolderExplorerV2Props) {
 
         const draft: Array<{id: string, name: string, parent: Array<string>, depth: number}> = []
         
-        let openedFolders = [...openFolders]
         let depth = 0
 
         for(let i = 0; i < store.length; ++i) {
             const folder = store[i]
         
             if (depth === 0) {
-                const parentDirId = folder.meta?.parentDirId ?? ""
-
                 draft.push({
                     id: folder.id,
                     name: folder.name, 
-                    parent: [parentDirId], 
+                    parent: [folder.meta?.parentDirId ?? ""], 
                     depth
                 })
-
-                if (!openedFolders.includes(parentDirId)) {
-                    openedFolders.push(parentDirId)
-                }
-
-                if (!openedFolders.includes(folder.id)) {
-                    openedFolders.push(folder.id)
-                }
             }
 
             depth++
@@ -71,8 +62,8 @@ export function useFolderExplorerV2({store}: FolderExplorerV2Props) {
                 const parent = parentFolder.parent ? 
                     [...parentFolder.parent, folder.id] :
                     [folder.id]
-console.log(parent, openedFolders)
-                if (!parent.every((openFolder) => openedFolders.includes(openFolder))) {
+
+                if (!parent.every((openFolder) => openFolders.includes(openFolder))) {
                     continue
                 }
 
@@ -117,7 +108,7 @@ console.log(parent, openedFolders)
     }
 
     const openFolder = (folderId: string) => {
-        setSelectedFolder((state) => {
+        setOpenFolders((state) => {
             if (state.includes(folderId)) {
                 return state
             }
