@@ -1,4 +1,4 @@
-import { ArchiveIcon, FileIcon } from "@radix-ui/react-icons";
+import { ArchiveIcon, CrumpledPaperIcon, FileIcon } from "@radix-ui/react-icons";
 import * as ContextMenu from "../components/context-menu/context-menu";
 import { useFileExplorerV2 } from "../components/file-explorer/use-file-explorer-v2";
 import * as FolderContentExplorer from "../components/folder-content-explorer/folder-content-explorer";
@@ -21,7 +21,9 @@ export const V2: React.FC = () => {
         rename,
         createTempFolder,
         updateFile,
-        createTempFile
+        createTempFile,
+        selectedFiles,
+        selectFile
     } = useFileExplorerV2({
         defaultFolder: generateFolder({canRoot: true})
     })
@@ -160,7 +162,7 @@ export const V2: React.FC = () => {
                     }
 
                     files.map((file) => {
-                        createTempFile(currentFolder.id, file.name)
+                        createTempFile(currentFolder.id, {name: file.name})
                     })
                     
                 }}
@@ -192,7 +194,7 @@ export const V2: React.FC = () => {
                                 }
                                 }}
                                 onClick={(e) => {
-                                //selectFile(file)
+                                    selectFile(file)
                                 }}
                                 className="py-1 px-2"
                             >
@@ -300,6 +302,36 @@ export const V2: React.FC = () => {
                 </ContextMenu.Root>
             </Dropzone.Root>
         </div>
+        <div className="border-l border-gray-300">
+        <div className="p-6 pt-0">
+            {selectedFiles.length === 0 ? (
+              <div className="text-center">
+                <CrumpledPaperIcon className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucun fichier sélectionné</h3>
+                <p className="mt-1 text-sm text-gray-500">Naviguez et sélectionnez un fichier pour voir plus d'informations.</p>
+            </div>
+            ): null}
+            {selectedFiles.length === 1 ? (
+              <div className="flex flex-col space-y-1.5 p-6">
+                 {selectedFiles[0].type === "folder" ? (
+                    <ArchiveIcon className="h-16 w-16 text-gray-600" />
+                  ): null}
+                    {selectedFiles[0].type === "file" ? (
+                    <FileIcon className="h-16 w-16 text-gray-600" />
+                  ): null}
+                <h3 className="font-semibold leading-none tracking-tight">
+                  {selectedFiles[0].name}
+                </h3>
+                <p className="text-sm text-gray-300">
+                  {selectedFiles[0].meta?.parentDirId}
+                </p>
+              </div>
+            ): null}
+            {selectedFiles.length > 1 ? (
+              <>Beaucou^p</>
+            ): null}
+        </div>
+      </div>
     </div>
     )
 }

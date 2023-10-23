@@ -38,7 +38,9 @@ type Props = {
 }
 
 
-
+type PartialRecord<K extends keyof any, T> = {
+    [P in K]?: T;
+  };
 
 const convertToInternalFiles = (folder: FolderFiles) => {
     return {
@@ -142,7 +144,7 @@ export function useFileExplorerV2({defaultFolder}: Props) {
 
     const createTempFile = (
         parentFolderId: string,
-        defaultFile?: InternalFile
+        defaultFile?: Partial<InternalFile>
     ) => {
         const parentFolder = store.find((folder) => folder.id === parentFolderId)
 
@@ -182,7 +184,7 @@ export function useFileExplorerV2({defaultFolder}: Props) {
         return newFile
     }
 
-    const createTempFolder = (parentFolder: string, defaultFolder?: InternalFile) => {
+    const createTempFolder = (parentFolder: string, defaultFolder?: Partial<InternalFile>) => {        
         return createTempFile(
             parentFolder, {
             name:  "New Folder",
@@ -205,6 +207,8 @@ export function useFileExplorerV2({defaultFolder}: Props) {
         startRenaming,
         rename,
         createTempFolder,
-        createTempFile
+        createTempFile,
+        selectedFiles,
+        selectFile
     }
 }
