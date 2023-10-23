@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { folders } from "./data";
 import {
   FolderInterface,
@@ -11,7 +10,7 @@ const FileExplorer = ({
   foldersIcon,
   openFolderIcon,
   imageIcon,
-}: any) => {
+}: FolderRender) => {
   const props: FolderRender = {
     TextIcon,
     foldersIcon,
