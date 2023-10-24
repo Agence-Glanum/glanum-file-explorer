@@ -70,9 +70,21 @@ export function useFileExplorerV2({defaultFolder}: Props) {
         setCurrentFolderId(folderId)
     }
 
-    const updateFolder = async (folderId: string, updatedFolder: FolderFiles) => {
+    const updateFolder = async (updatedFolder: FolderFiles, {refresh = false, partial = false}) => {
         setStore(produce((store) => {
-            if (store.find(((folder) => folder.id === folderId))) {
+            const folderIndex = store.findIndex((folder) => folder.id === updatedFolder.id)
+
+            if (folderIndex !== -1) {
+
+                if (refresh) {
+                    store.splice(0, 1, updatedFolder)
+                    return
+                }
+
+                if (partial) {
+                    store[folderIndex].files.push(...updatedFolder.files)
+                }
+
                 return 
             }
 
@@ -96,7 +108,7 @@ export function useFileExplorerV2({defaultFolder}: Props) {
 
             store.push(convertToInternalFiles(updatedFolder))
         }))
-        await focusFolder(folderId)
+        await focusFolder(updatedFolder.id)
     }
 
     const selectFile = (file: InternalFile|InternalFile[]) => {

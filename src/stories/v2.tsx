@@ -50,13 +50,13 @@ export const V2: React.FC = () => {
                     <ContextMenu.Trigger asChild>
                         <FolderExplorer.Content
                             onDoubleClick={() => {
-                                updateFolder(folder.id, generateFolder({
+                                updateFolder(generateFolder({
                                     folderId: folder.id, 
                                     parentFolderId: folder.parent[folder.parent.length - 1],
                                     baseFolder: {
                                         name: folder.name
                                     }
-                                }))
+                                }), {})
                                 toggleOpenFolder(folder.id)
                                 selectFolder(folder.id)
                             }}
@@ -74,13 +74,13 @@ export const V2: React.FC = () => {
                             <FolderExplorer.OpenIndicator
                                 open={isFolderOpen(folder.id)}
                                 onClick={() => {
-                                    updateFolder(folder.id, generateFolder({
+                                    updateFolder(generateFolder({
                                         folderId: folder.id, 
                                         parentFolderId: folder.parent[folder.parent.length - 1],
                                         baseFolder: {
                                             name: folder.name
                                         }
-                                    }))
+                                    }), {})
                                     selectFolder(folder.id)
                                     toggleOpenFolder(folder.id)
                                 }}
@@ -92,13 +92,13 @@ export const V2: React.FC = () => {
                         <ContextMenu.Content>
                         <ContextMenu.Item
                             onClick={() => {
-                                updateFolder(folder.id, generateFolder({
+                                updateFolder(generateFolder({
                                     folderId: folder.id, 
                                     parentFolderId: folder.parent[folder.parent.length - 1],
                                     baseFolder: {
                                         name: folder.name
                                     }
-                                }))
+                                }), {})
                                 toggleOpenFolder(folder.id)
                                 selectFolder(folder.id)
                             }}
@@ -144,7 +144,7 @@ export const V2: React.FC = () => {
                                     canRoot: true
                                 })
 
-                                updateFolder(folder.id, folder)
+                                updateFolder(folder, {})
                                 selectFolder(folder.id)
                                 openFolder(folder?.meta?.parentDirId ?? "")
                             }}
@@ -182,15 +182,15 @@ export const V2: React.FC = () => {
                                 key={file.id}
                                 onDoubleClick={() => {
                                 if (file.type === "folder") {
-                                    updateFolder(file.id, generateFolder({
+                                    updateFolder(generateFolder({
                                         folderId: file.id, 
                                         parentFolderId: file.meta?.parentDirId,
                                         baseFolder: {
                                             name: file.name
                                         }
-                                    }))
+                                    }), {})
                                     selectFolder(file.id)
-                                    toggleOpenFolder(file.id)   
+                                    openFolder(file.id)   
                                 }
                                 }}
                                 onClick={(e) => {
@@ -233,15 +233,15 @@ export const V2: React.FC = () => {
                                         <ContextMenu.Item
                                         onClick={(e) => {
                                             e.stopPropagation()
-                                            updateFolder(file.id, generateFolder({
+                                            updateFolder(generateFolder({
                                                 folderId: file.id, 
                                                 parentFolderId: file.meta?.parentDirId,
                                                 baseFolder: {
                                                     name: file.name
                                                 }
-                                            }))
+                                            }), {})
                                             selectFolder(file.id)
-                                            toggleOpenFolder(file.id)
+                                            openFolder(file.id)
                                         }}
                                         >
                                         Open
