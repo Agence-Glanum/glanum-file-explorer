@@ -13,7 +13,7 @@ const useFolderItemRender = ({ ...props }: FolderRender, openFolders: Array<numb
   const isOpen: boolean = openFolders!.includes(folder!.id);
   const isImage = (name: string): boolean => name.split(".")[1] === "jpg";
 
-  const renderFileIcon = (fileName: string): JSX.Element => {
+  const renderFileIcon = (fileName: string): JSX.Element | undefined => {
     if (isImage(fileName)) {
       return imageIcon;
     } else {
@@ -21,7 +21,7 @@ const useFolderItemRender = ({ ...props }: FolderRender, openFolders: Array<numb
     }
   };
 
-  const folderIcon: JSX.Element = isOpen ? (
+  const folderIcon: JSX.Element | undefined = isOpen ? (
     openFolderIcon
   ) : (
     foldersIcon
