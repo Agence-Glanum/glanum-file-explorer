@@ -1,12 +1,14 @@
 export interface File {
     id: number;
     name: string;
-    metadata: {size: string, created_at: string }
+    metadata: {size: string, created_at: string };
+    path: string;
 }
 
 export interface FolderInterface {
     id: number;
     name: string;
+    path: string
     content: (File | FolderInterface)[];
 }
 
@@ -18,6 +20,7 @@ export interface FolderRender {
     openFolderIcon: JSX.Element;
     imageIcon: JSX.Element
 }
+
 export interface SubFolderExplorerInterface {
     folder: FolderInterface;
     toggleFolder?: (folderName: string) => void;

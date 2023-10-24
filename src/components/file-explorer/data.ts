@@ -18,10 +18,11 @@ const generateFolder = (name: string, depth: number, maxDepth: number) => {
     const folder: FolderInterface = {
         id: folderId,
         name: name,
+        path: `/path/${name}`,
         content: [
-            {id: generateRandomId(), name: `file${depth}.txt`, metadata: {size: "10 ko", created_at: "23/10/2023" } },
-            {id: generateRandomId(), name: `file${depth}.jpg`, metadata: {size: "10 ko", created_at: "23/10/2023" } },
-            {id: generateRandomId(), name: `file${depth}.pdf`, metadata: {size: "10 ko", created_at: "23/10/2023" } },
+            {id: generateRandomId(), name: `file${depth}.txt`, metadata: {size: "10 ko", created_at: "23/10/2023" }, path: `/path/file${depth}.txt` },
+            {id: generateRandomId(), name: `file${depth}.jpg`, metadata: {size: "10 ko", created_at: "23/10/2023" }, path: `/path/file${depth}.jpg` },
+            {id: generateRandomId(), name: `file${depth}.pdf`, metadata: {size: "10 ko", created_at: "23/10/2023" }, path: `/path/file${depth}.pdf` },
         ],
     };
 
@@ -32,9 +33,11 @@ const generateFolder = (name: string, depth: number, maxDepth: number) => {
     );
 
     if (subfolder.length > 0) {
+        const folderName = generateRandomFolderName(); 
         folder.content.push({
             id: generateRandomId(),
-            name: generateRandomFolderName(),
+            name: folderName,
+            path: `/path/${folderName}`,
             content: subfolder,
         });
     }
