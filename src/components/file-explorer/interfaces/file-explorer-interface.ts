@@ -15,10 +15,10 @@ export interface FolderInterface {
 export interface FolderRender {
     folder?: FolderInterface;
     openFolders?: Array<number>;
-    TextIcon: JSX.Element;
-    foldersIcon: JSX.Element;
-    openFolderIcon: JSX.Element;
-    imageIcon: JSX.Element
+    TextIcon?: JSX.Element;
+    foldersIcon?: JSX.Element;
+    openFolderIcon?: JSX.Element;
+    imageIcon?: JSX.Element
 }
 
 export interface SubFolderExplorerInterface {

@@ -11,9 +11,8 @@ import {
 } from "react-icons/bs";
 import { FaFolderClosed, FaFolderOpen } from "react-icons/fa6";
 import { folders } from "./data";
-import FolderExplorer from "./folder-explorer";
-import FileExplorer from "./file-explorer";
 import { FolderInterface } from "./interfaces/file-explorer-interface";
+import FolderExplorer from "./folder-explorer";
 
 const customImageIcon: JSX.Element = (
   <FileImage color="black" strokeWidth="0.5px" />
