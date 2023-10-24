@@ -10,8 +10,10 @@ import {
   BsFileImage,
 } from "react-icons/bs";
 import { FaFolderClosed, FaFolderOpen } from "react-icons/fa6";
-
+import { folders } from "./data";
+import FolderExplorer from "./folder-explorer";
 import FileExplorer from "./file-explorer";
+import { FolderInterface } from "./interfaces/file-explorer-interface";
 
 const customImageIcon: JSX.Element = (
   <FileImage color="black" strokeWidth="0.5px" />
@@ -100,8 +102,8 @@ const folderOpenIcons = {
 };
 
 export default {
-  title: "ReactComponentLibrary/FileExplorer",
-  component: FileExplorer,
+  title: "ReactComponentLibrary/FolderExplorer",
+  component: FolderExplorer,
   argTypes: {
     customTextIcons: {
       options: Object.keys(fileTexticons),
@@ -130,7 +132,7 @@ export default {
   },
 } as Meta;
 
-type Story = StoryObj<typeof FileExplorer>;
+type Story = StoryObj<typeof FolderExplorer>;
 export interface FileExplorerProps {
   customTextIcons: keyof typeof fileTexticons;
   customFolderIcons: keyof typeof folderIcons;
@@ -138,7 +140,7 @@ export interface FileExplorerProps {
   customOpenFolderIcons: keyof typeof folderOpenIcons;
 }
 
-export const Fileexplorer: Story = {
+export const Folderexplorer: Story = {
   render: (args: FileExplorerProps) => {
     const {
       customTextIcons,
@@ -148,16 +150,27 @@ export const Fileexplorer: Story = {
     } = args;
 
     return (
-      <FileExplorer
-        TextIcon={fileTexticons[customTextIcons]}
-        foldersIcon={folderIcons[customFolderIcons]}
-        openFolderIcon={folderOpenIcons[customOpenFolderIcons]}
-        imageIcon={fileImageicons[customImageIcons]}
-      />
+      <>
+        <ul>
+          {folders?.map((item: FolderInterface) => {
+            return (
+              <li key={item.id}>
+                <FolderExplorer
+                  folder={item}
+                  TextIcon={fileTexticons[customTextIcons]}
+                  foldersIcon={folderIcons[customFolderIcons]}
+                  openFolderIcon={folderOpenIcons[customOpenFolderIcons]}
+                  imageIcon={fileImageicons[customImageIcons]}
+                />
+              </li>
+            );
+          })}
+        </ul>
+      </>
     );
   },
 };
-Fileexplorer.args = {
+Folderexplorer.args = {
   customTextIcons: "customTextIcon",
   customFolderIcons: "customFolderIcon",
   customImageIcons: "customImageIcon",

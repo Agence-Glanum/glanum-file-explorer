@@ -6,19 +6,31 @@ import {
 import useFolderToggle from "./hooks/useToggleFolder";
 import useFolderItemRender from "./hooks/useFolderItemRender";
 
-const FolderExplorer = ({ ...props }: FolderRender) => {
+const FolderExplorer = ({
+  folder,
+  TextIcon,
+  foldersIcon,
+  openFolderIcon,
+  imageIcon,
+}: FolderRender) => {
+  const props: FolderRender = {
+    folder,
+    TextIcon,
+    foldersIcon,
+    openFolderIcon,
+    imageIcon,
+  };
   const { openFolders, toggleFolder } = useFolderToggle();
   const { isOpen, renderFileIcon, folderIcon } = useFolderItemRender(
     { ...props },
     openFolders
   );
-  const { folder, TextIcon, foldersIcon, openFolderIcon, imageIcon } = props;
 
   return (
     <div key={folder!.name}>
       <span
         className="flex cursor-pointer select-none"
-        onClick={() => toggleFolder(folder!.name)}
+        onClick={() => toggleFolder(folder!.id)}
       >
         {folderIcon} <strong>{folder!.name}</strong>
       </span>

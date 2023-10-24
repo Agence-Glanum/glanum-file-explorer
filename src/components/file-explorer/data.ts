@@ -55,7 +55,7 @@ const generateCompleteStructure = (numFolders: number) => {
     return structure;
 };
 
-const additionalFolders = generateCompleteStructure(1);
+const additionalFolders = generateCompleteStructure(10);
 
 folders.push(...additionalFolders);
 

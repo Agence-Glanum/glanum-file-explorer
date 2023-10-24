@@ -1,6 +1,6 @@
 import { FolderRender } from "../interfaces/file-explorer-interface";
 
-const useFolderItemRender = ({ ...props }: FolderRender, openFolders: Array<string>) => {
+const useFolderItemRender = ({ ...props }: FolderRender, openFolders: Array<number>) => {
 
   const {
     folder,
@@ -10,7 +10,7 @@ const useFolderItemRender = ({ ...props }: FolderRender, openFolders: Array<stri
     imageIcon,
   } = props;
 
-  const isOpen: boolean = openFolders!.includes(folder!.name);
+  const isOpen: boolean = openFolders!.includes(folder!.id);
   const isImage = (name: string): boolean => name.split(".")[1] === "jpg";
 
   const renderFileIcon = (fileName: string): JSX.Element => {

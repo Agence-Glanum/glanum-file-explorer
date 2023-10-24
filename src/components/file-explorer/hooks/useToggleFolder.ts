@@ -3,41 +3,41 @@ import { folders } from "../data";
 import { FolderInterface } from '../interfaces/file-explorer-interface';
 
 const useFolderToggle = () => {
-  const [openFolders, setOpenFolders] = useState<Array<string>>([]);
+  const [openFolders, setOpenFolders] = useState<Array<number>>([]);
 
-  const toggleFolder = (folderName: string): void => {
-    if (openFolders.includes(folderName)) {
-      setOpenFolders(openFolders.filter((name: string) => name !== folderName));
-      closeSubfolders(folderName);
+  const toggleFolder = (folderId: number): void => {
+    if (openFolders.includes(folderId)) {
+      setOpenFolders(openFolders.filter((id: number) => id !== folderId));
+      closeSubfolders(folderId);
     } else {
-      setOpenFolders([...openFolders, folderName]);
+      setOpenFolders([...openFolders, folderId]);
     }
   };
 
-  const closeSubfolders = (folderName: string): void => {
-    const folderToClose = findFolder(folders, folderName);
+  const closeSubfolders = (folderId: number): void => {
+    const folderToClose = findFolder(folders, folderId);
     if (folderToClose) {
       folderToClose.content
         .filter((item): item is FolderInterface => 'content' in item)
         .forEach((item) => {
-          setOpenFolders((prevOpenFolders: Array<string>) =>
-            prevOpenFolders.filter((name: string) => name !== item.name)
+          setOpenFolders((prevOpenFolders: Array<number>) =>
+            prevOpenFolders.filter((id: number) => id !== item.id)
           );
-          closeSubfolders(item.name);
+          closeSubfolders(item.id);
         });
     }
   };
 
   const findFolder = <T extends File | FolderInterface>(
     folders: Array<T>,
-    folderName: string
+    folderId: number,
   ): T | null => {
     for (const folder of folders) {
-      if (folder.name === folderName) {
-        return folder;
+      if ('id' in folder && folder.id === folderId) {
+        return folder as T;
       }
       if ('content' in folder && folder.content) {
-        const result = findFolder(folder.content as Array<T>, folderName);
+        const result = findFolder(folder.content as Array<T>, folderId);
         if (result) {
           return result;
         }
