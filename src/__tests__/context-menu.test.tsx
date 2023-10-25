@@ -1,6 +1,6 @@
-import ContextMenuComponent from "../context-menu";
-import { TriggerComponent } from "../trigger-component";
-import data from "../../../mock/context-menu";
+import ContextMenuComponent from "../components/context-menu/context-menu";
+import { TriggerComponent } from "../components/context-menu/trigger-component";
+import data from "../mock/context-menu";
 import { render } from "@testing-library/react";
 
 describe("ContextMenu", () => {

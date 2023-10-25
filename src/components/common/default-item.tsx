@@ -2,7 +2,7 @@ import "../../styles/style.css"
 
 import * as ContextMenu from "@radix-ui/react-context-menu";
 
-import { ContextMenuItemProps } from "../../types/context-menu-type";
+import { ContextMenuItemProps } from "../../types/context-menu";
 
 function DefaultItem({key, item, state}: ContextMenuItemProps) {
     return (

@@ -1,6 +1,6 @@
 import * as ContextMenu from "@radix-ui/react-context-menu";
 
-import { ContextMenuProps, Item } from "../../types/context-menu-type";
+import { ContextMenuProps, Item } from "../../types/context-menu";
 
 import CheckboxItem from "../common/checkbox-item";
 import DefaultItem from "../common/default-item";

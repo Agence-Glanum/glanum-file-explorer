@@ -3,7 +3,7 @@ import "../../styles/style.css"
 import * as ContextMenu from "@radix-ui/react-context-menu";
 
 import { CheckIcon } from "@radix-ui/react-icons";
-import { ContextMenuItemProps } from "../../types/context-menu-type";
+import { ContextMenuItemProps } from "../../types/context-menu";
 import useCheckbox from "../../hooks/useCheckbox";
 
 function CheckboxItem({key, item, index, state}: ContextMenuItemProps) {

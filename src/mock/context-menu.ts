@@ -1,4 +1,4 @@
-import { Item } from "../types/context-menu-type";
+import { Item } from "../types/context-menu";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 //custom hook

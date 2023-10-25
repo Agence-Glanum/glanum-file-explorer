@@ -1,4 +1,4 @@
-import { ItemState } from "../types/context-menu-type"
+import { ItemState } from "../types/context-menu"
 import { create } from "zustand"
 
 interface ContextMenuState {
