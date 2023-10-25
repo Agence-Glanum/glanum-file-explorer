@@ -3,7 +3,7 @@ import * as ContextMenu from "../components/context-menu/context-menu";
 import { useFileExplorerV2 } from "../components/file-explorer/use-file-explorer-v2";
 import * as FolderContentExplorer from "../components/folder-content-explorer/folder-content-explorer";
 import * as Virtualizer from "../components/virtualizer/virtualizer";
-import { generateFolder } from "../data/data";
+import { generateFilesData, generateFolder } from "../data/data";
 import { useFolderExplorerV2 } from "../components/folder-explorer/use-folder-explorer-v2";
 import * as FolderExplorer from "../components/folder-explorer/folder-explorer";
 import * as Dropzone from "../components/dropzone/dropzone";
@@ -173,6 +173,17 @@ export const V2: React.FC = () => {
                 <ContextMenu.Root>
                     <ContextMenu.Trigger>
                     <Virtualizer.Grid
+                        onSrollEnd={() => {
+                            if (!currentFolder) {
+                                return
+                            }
+
+                            updateFolder({
+                                ...currentFolder,
+                                files: generateFilesData(currentFolder?.id, 0)}, 
+                                {partial: true}
+                            )
+                        }}
                         estimeHeight={115}
                         estimateWidth={150}
                         className="w-full"

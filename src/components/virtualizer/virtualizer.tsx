@@ -1,5 +1,5 @@
 import { useVirtualizer } from "@tanstack/react-virtual"
-import React, { cloneElement } from "react"
+import React, { cloneElement, useEffect } from "react"
 import { ReactElement, useRef } from "react"
 import { cn } from "../../utils/cn"
 
@@ -7,6 +7,7 @@ interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
     estimateWidth?: number
     estimeHeight?: number
     columns?: number
+    onSrollEnd?: () => void
     children: ReactElement[]|ReactElement
 }
 
@@ -15,6 +16,7 @@ const Grid = ({
     columns = 5,
     estimateWidth = 75,
     estimeHeight = 75,
+    onSrollEnd,
     children,
     ...props
 }: GridProps) => {
@@ -22,9 +24,11 @@ const Grid = ({
     const parentRef = useRef(null)
 
     const rows = Array.isArray(children) ? children : [children]
+    const rowCount = Math.ceil(rows.length / columns)
+
 
     const rowVirtualizer = useVirtualizer({
-        count: Math.ceil(rows.length / columns),
+        count: rowCount,
         getScrollElement: () => parentRef.current,
         estimateSize: () => estimeHeight,
         overscan: 5,
@@ -37,6 +41,22 @@ const Grid = ({
         estimateSize: () => estimateWidth,
         overscan: 5,
     })
+
+    useEffect(() => {
+        if (!onSrollEnd) {
+            return
+        }
+
+        const [lastItem] = [...rowVirtualizer.getVirtualItems()].reverse()
+
+        if (!lastItem) {
+          return
+        }
+    
+        if (lastItem.index >= rowCount - 1 ) {
+            onSrollEnd()
+        }
+    }, [rowVirtualizer.getVirtualItems()])
 
   return (
     <>

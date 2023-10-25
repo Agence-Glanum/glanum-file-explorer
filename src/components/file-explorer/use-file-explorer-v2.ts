@@ -30,6 +30,10 @@ export interface Folder extends File {
 }
 
 export interface FolderFiles extends Folder {
+    files: Array<File>
+}
+
+export interface InternalFolderFiles extends Folder {
     files: Array<InternalFile>
 }
 
@@ -42,7 +46,7 @@ type PartialRecord<K extends keyof any, T> = {
     [P in K]?: T;
   };
 
-const convertToInternalFiles = (folder: FolderFiles) => {
+const convertToInternalFiles = (folder: FolderFiles): InternalFolderFiles => {
     return {
         ...folder,
         files: folder.files.map((file) => {
@@ -52,7 +56,7 @@ const convertToInternalFiles = (folder: FolderFiles) => {
 }
 
 export function useFileExplorerV2({defaultFolder}: Props) {
-    const [store, setStore] = useState<Array<FolderFiles>>([])
+    const [store, setStore] = useState<Array<InternalFolderFiles>>([])
     const [currentFolderId, setCurrentFolderId] = useState<string|null>(null)
     const [selectedFiles, setSelectedFiles] = useState<Array<InternalFile>>([])
     const [renaming, setRenaming] = useState<InternalFile|null>(null)
@@ -77,12 +81,12 @@ export function useFileExplorerV2({defaultFolder}: Props) {
             if (folderIndex !== -1) {
 
                 if (refresh) {
-                    store.splice(0, 1, updatedFolder)
+                    store.splice(0, 1, convertToInternalFiles(updatedFolder))
                     return
                 }
 
                 if (partial) {
-                    store[folderIndex].files.push(...updatedFolder.files)
+                    store[folderIndex].files.push(...convertToInternalFiles(updatedFolder).files)
                 }
 
                 return 
@@ -99,7 +103,7 @@ export function useFileExplorerV2({defaultFolder}: Props) {
 
             if (parentIndex !== -1) {
                 if (parentIndex === 0) {
-                    store.splice(0, 0, updatedFolder)
+                    store.splice(0, 0, convertToInternalFiles(updatedFolder))
                     return
                 }
                 store.splice(parentIndex - 1, 0, convertToInternalFiles(updatedFolder))
@@ -207,7 +211,7 @@ export function useFileExplorerV2({defaultFolder}: Props) {
 
     const currentFolder = store.find(((folder) => folder.id === currentFolderId)) ?? null
 
-    const currentFolderContent = currentFolder ? (currentFolder as FolderFiles).files ?? [] : []
+    const currentFolderContent = currentFolder ? (currentFolder as InternalFolderFiles).files ?? [] : []
 
     return {
         currentFolder,

@@ -2,11 +2,23 @@ import { v4 as uuidv4 } from 'uuid';
 import { faker } from '@faker-js/faker';
 import { Folder, File } from '../components/file-explorer/use-file-explorer-v2';
 
-const generateFilesData = (parentFolderId: string): (File|Folder)[] => {
-    return [...Array(10000).keys()].map(() => {
+const generateFilesData = (parentFolderId: string, folderWeight: number = 20): (File|Folder)[] => {
+    return [...Array(100).keys()].map(() => {
+
+        if (folderWeight <= 0) {
+            return {
+                id: uuidv4(),
+                name: faker.system.commonFileName(),
+                type: 'file',
+                sync: true,
+                meta: {
+                    parentDirId: parentFolderId
+                }
+            }
+        }
 
         return faker.helpers.weightedArrayElement([
-            {weight: 20, value: {
+            {weight: folderWeight, value: {
                 id: uuidv4(),
                 name: faker.system.commonFileName(),
                 type: 'folder',
@@ -17,7 +29,7 @@ const generateFilesData = (parentFolderId: string): (File|Folder)[] => {
                     parentDirId: parentFolderId
                 }
             }}, 
-            {weight: 80, value: {
+            {weight: 100 - folderWeight, value: {
                 id: uuidv4(),
                 name: faker.system.commonFileName(),
                 type: 'file',
@@ -76,4 +88,4 @@ const generateFolder = ({folderId, parentFolderId, child, baseFolder, canRoot = 
 
 
 
-export { generateFolderData, generateFolder }
+export { generateFilesData, generateFolderData, generateFolder }
