@@ -3,6 +3,7 @@ export interface File {
     name: string;
     metadata: {size: string, created_at: string };
     path: string;
+    type: string;
 }
 
 export interface FolderInterface {
@@ -10,6 +11,7 @@ export interface FolderInterface {
     name: string;
     path: string
     content: (File | FolderInterface)[];
+    type: string;
 }
 
 export interface FolderRender {
