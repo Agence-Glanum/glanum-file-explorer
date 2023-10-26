@@ -1,11 +1,12 @@
-import { FolderFiles } from "../file-explorer/use-file-explorer-v2"
 import { useEffect, useState } from "react"
+import { FolderFiles } from "../types/file"
+import { TreeFolder } from "../types/tree"
 
-type FolderExplorerV2Props = {
+type TreeExplorerProps = {
     store: Array<FolderFiles>
 }
 
-export function useFolderExplorerV2({store}: FolderExplorerV2Props) {
+export function useTreeExplorer({store}: TreeExplorerProps) {
     const [selectedFolder, setSelectedFolder] = useState<Array<string>>([])
     const [openFolders, setOpenFolders] = useState<Array<string>>([])
     const [first, setFirst] = useState(false)
@@ -22,7 +23,7 @@ export function useFolderExplorerV2({store}: FolderExplorerV2Props) {
 
     const folders = () => {
 
-        const draft: Array<{id: string, name: string, parent: Array<string>, depth: number}> = []
+        const draft: Array<TreeFolder> = []
         
         let depth = 0
 

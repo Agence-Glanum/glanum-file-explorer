@@ -1,15 +1,19 @@
 import { ArchiveIcon, CrumpledPaperIcon, FileIcon } from "@radix-ui/react-icons";
 import * as ContextMenu from "../components/context-menu/context-menu";
-import { useFileExplorerV2 } from "../components/file-explorer/use-file-explorer-v2";
+import { useFileExplorer } from "../hooks/use-file-explorer";
 import * as FolderContentExplorer from "../components/folder-content-explorer/folder-content-explorer";
 import * as Virtualizer from "../components/virtualizer/virtualizer";
 import { generateFilesData, generateFolder } from "../data/data";
-import { useFolderExplorerV2 } from "../components/folder-explorer/use-folder-explorer-v2";
-import * as FolderExplorer from "../components/folder-explorer/folder-explorer";
+import { useTreeExplorer } from "../hooks/use-tree-explorer";
+import * as TreeExplorer from "../components/tree-explorer/tree-explorer";
 import * as Dropzone from "../components/dropzone/dropzone";
+import { File } from "../types/file"
 import clsx from "clsx";
+import { useState } from "react";
 
 export const V2: React.FC = () => {
+
+    const [renaming, setRenaming] = useState<File|null>(null)
 
     const {
         currentFolder,
@@ -17,14 +21,12 @@ export const V2: React.FC = () => {
         updateFolder,
         focusFolder,
         store,
-        startRenaming,
-        rename,
         createTempFolder,
         updateFile,
         createTempFile,
         selectedFiles,
         selectFile
-    } = useFileExplorerV2({
+    } = useFileExplorer({
         defaultFolder: generateFolder({canRoot: true})
     })
 
@@ -35,20 +37,20 @@ export const V2: React.FC = () => {
         toggleOpenFolder,
         isFolderOpen,
         openFolder
-    } = useFolderExplorerV2({ store })
+    } = useTreeExplorer({ store })
     
     return (
         <div className="flex p-4 h-screen bg-neutral-50">
             <Virtualizer.List className="h-full border-r border-gray-300" estimateSize={32}>
                 {folders().map((folder) =>(
-                <FolderExplorer.Item
+                <TreeExplorer.Item
                     key={folder.id}
                     className="h-[32px]"
                 >
-                    <FolderExplorer.DepthIndicator depth={folder.depth} offset={7}/>
+                    <TreeExplorer.DepthIndicator depth={folder.depth} offset={7}/>
                     <ContextMenu.Root>
                     <ContextMenu.Trigger asChild>
-                        <FolderExplorer.Content
+                        <TreeExplorer.Content
                             onDoubleClick={() => {
                                 updateFolder(generateFolder({
                                     folderId: folder.id, 
@@ -71,7 +73,7 @@ export const V2: React.FC = () => {
                             )}
                             title={folder.name}
                         >
-                            <FolderExplorer.OpenIndicator
+                            <TreeExplorer.OpenIndicator
                                 open={isFolderOpen(folder.id)}
                                 onClick={() => {
                                     updateFolder(generateFolder({
@@ -87,7 +89,7 @@ export const V2: React.FC = () => {
                             />
                             <ArchiveIcon className="ml-1" />
                             <span className="ml-2 max-w-[75px] truncate">{folder.name}</span>
-                        </FolderExplorer.Content>  
+                        </TreeExplorer.Content>  
                     </ContextMenu.Trigger>
                         <ContextMenu.Content>
                         <ContextMenu.Item
@@ -128,7 +130,7 @@ export const V2: React.FC = () => {
                         ) : null}
                         </ContextMenu.Content>
                     </ContextMenu.Root>
-                </FolderExplorer.Item>
+                </TreeExplorer.Item>
                 ))}
             </Virtualizer.List>
             <div className="px-4 h-full">
@@ -218,17 +220,21 @@ export const V2: React.FC = () => {
                                     {file.type === "file" ? (
                                         <FileIcon className="h-16 w-16 text-gray-600" />
                                     ): null}
-                                    {file.renaming ? (
+                                    {renaming?.id === file.id ? (
                                         <FolderContentExplorer.RenameInput
                                         type="text"
                                         defaultValue={file.name}
                                         onKeyUp={(e) => {
                                             if(e.key === 'Enter'){
-                                                rename({...file, name: e.target.value })
+                                                updateFile({...file,  name: e.target.value})
+                                                setRenaming(null)
+                                                selectFile({...file,  name: e.target.value})
                                             }
                                         }}
                                         onClickOutside={(value) => {
-                                            rename({...file, name: value})
+                                            updateFile({...file,  name: value})
+                                            setRenaming(null)
+                                            selectFile({...file,  name: value})
                                         }}
                                         />
                                     ): (
@@ -260,7 +266,7 @@ export const V2: React.FC = () => {
                                     ): null}
                                         <ContextMenu.Item
                                         onClick={() => {
-                                            startRenaming(file)
+                                            setRenaming(file)
                                         }}
                                     >
                                         Rename

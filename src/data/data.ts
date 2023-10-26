@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { faker } from '@faker-js/faker';
-import { Folder, File } from '../components/file-explorer/use-file-explorer-v2';
+import { Folder, File } from '../types/file';
 
 const generateFilesData = (parentFolderId: string, folderWeight: number = 20): (File|Folder)[] => {
     return [...Array(100).keys()].map(() => {
@@ -22,7 +22,6 @@ const generateFilesData = (parentFolderId: string, folderWeight: number = 20): (
                 id: uuidv4(),
                 name: faker.system.commonFileName(),
                 type: 'folder',
-                path: [{id: "", name: ""}],
                 root: false,
                 sync: true,
                 meta: {
@@ -74,7 +73,6 @@ const generateFolder = ({folderId, parentFolderId, child, baseFolder, canRoot = 
             id,
             name: faker.system.commonFileName(),
             type: 'folder',
-            path: [{id: "", name: ""}],
             root,
             sync: true,
             files,

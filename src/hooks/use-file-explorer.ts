@@ -1,65 +1,17 @@
 import { useEffect, useState } from "react"
-import HashTable from "../../utils/hash-table"
 import { produce } from "immer"
 import { v4 } from "uuid"
-
-export type File = {
-    id: string
-    type: string
-    name: string
-    sync: boolean
-    meta?: {
-        url?: string
-        parentDirId: string
-        thumbnail?: string
-        oldId?: string
-    }
-}
-
-export interface InternalFile extends File {
-    renaming: boolean
-}
-
-export interface Folder extends File {
-    type: string
-    path: Array<{
-        id: string
-        name: string
-    }>
-    root: boolean
-}
-
-export interface FolderFiles extends Folder {
-    files: Array<File>
-}
-
-export interface InternalFolderFiles extends Folder {
-    files: Array<InternalFile>
-}
+import { FolderFiles, File } from "../types/file"
+import { convertToInternalFiles } from "../utils/convert-to-internal-files"
 
 type Props = {
     defaultFolder: FolderFiles,
 }
 
-
-type PartialRecord<K extends keyof any, T> = {
-    [P in K]?: T;
-  };
-
-const convertToInternalFiles = (folder: FolderFiles): InternalFolderFiles => {
-    return {
-        ...folder,
-        files: folder.files.map((file) => {
-            return {...file, renaming: false}
-        })
-    }
-}
-
-export function useFileExplorerV2({defaultFolder}: Props) {
-    const [store, setStore] = useState<Array<InternalFolderFiles>>([])
+export function useFileExplorer({defaultFolder}: Props) {
+    const [store, setStore] = useState<Array<FolderFiles>>([])
     const [currentFolderId, setCurrentFolderId] = useState<string|null>(null)
-    const [selectedFiles, setSelectedFiles] = useState<Array<InternalFile>>([])
-    const [renaming, setRenaming] = useState<InternalFile|null>(null)
+    const [selectedFiles, setSelectedFiles] = useState<Array<File>>([])
 
     useEffect(() => {
         setStore(produce((store) => {
@@ -115,13 +67,13 @@ export function useFileExplorerV2({defaultFolder}: Props) {
         await focusFolder(updatedFolder.id)
     }
 
-    const selectFile = (file: InternalFile|InternalFile[]) => {
+    const selectFile = (file: File|File[]) => {
         const files = Array.isArray(file) ? file : [file]
 
         setSelectedFiles(files)
     }
 
-    const updateFile = (file: InternalFile) => {
+    const updateFile = (file: File) => {
         setStore(produce((draft) => {
             const id = file.meta?.oldId ?? file.id
 
@@ -139,28 +91,9 @@ export function useFileExplorerV2({defaultFolder}: Props) {
         }))
     }
 
-    const startRenaming = (file: InternalFile) => {
-        if (renaming !== null) {
-            return
-        }
-
-        updateFile({...file, renaming: true})
-        setRenaming(file)
-    }
-
-    const rename = (file: InternalFile) => {
-        if (!file.renaming) {
-            return
-        }
-
-        updateFile({...file, renaming: false})
-        setRenaming(null)
-        selectFile(file)
-    }
-
     const createTempFile = (
         parentFolderId: string,
-        defaultFile?: Partial<InternalFile>
+        defaultFile?: Partial<File>
     ) => {
         const parentFolder = store.find((folder) => folder.id === parentFolderId)
 
@@ -177,7 +110,6 @@ export function useFileExplorerV2({defaultFolder}: Props) {
             type: defaultFile?.type ?? 'file',
             name: defaultFile?.name ?? 'New File',
             sync: defaultFile?.sync ?? false,
-            renaming: defaultFile?.renaming ?? false,
             ...(defaultFile ?? {}),
             meta: {
                 parentDirId: parentFolder.id,
@@ -193,14 +125,14 @@ export function useFileExplorerV2({defaultFolder}: Props) {
                 return
             }
 
-            foundFolder.files.push(newFile)     
+            foundFolder.files.splice(0, 0, newFile)     
         }))
 
 
         return newFile
     }
 
-    const createTempFolder = (parentFolder: string, defaultFolder?: Partial<InternalFile>) => {        
+    const createTempFolder = (parentFolder: string, defaultFolder?: Partial<File>) => {        
         return createTempFile(
             parentFolder, {
             name:  "New Folder",
@@ -211,7 +143,7 @@ export function useFileExplorerV2({defaultFolder}: Props) {
 
     const currentFolder = store.find(((folder) => folder.id === currentFolderId)) ?? null
 
-    const currentFolderContent = currentFolder ? (currentFolder as InternalFolderFiles).files ?? [] : []
+    const currentFolderContent = currentFolder ? (currentFolder as FolderFiles).files ?? [] : []
 
     return {
         currentFolder,
@@ -220,8 +152,6 @@ export function useFileExplorerV2({defaultFolder}: Props) {
         focusFolder,
         store,
         updateFile,
-        startRenaming,
-        rename,
         createTempFolder,
         createTempFile,
         selectedFiles,

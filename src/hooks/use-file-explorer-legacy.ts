@@ -98,7 +98,7 @@ const generateId = () => {
     return v4()
 }
 
-export function useFileExplorer({defaultFiles}: Props) {
+export function useFileExplorerLegacy({defaultFiles}: Props) {
 
     const [files, setFiles] = useState(convertToInternalFiles(defaultFiles.files))
     const [openFolders, setOpenFolders] = useState<Array<string>>([])

@@ -1,8 +1,8 @@
 import * as Virtualizer from "../components/virtualizer/virtualizer";
-import * as FolderExplorer from "../components/folder-explorer/folder-explorer";
+import * as FolderExplorer from "../components/tree-explorer/tree-explorer";
 import * as FolderContentExplorer from "../components/folder-content-explorer/folder-content-explorer";
 import * as Dropzone from "../components/dropzone/dropzone";
-import { useFileExplorer } from "../components/file-explorer/use-file-explorer";
+import { useFileExplorerLegacy } from "../hooks/use-file-explorer-legacy";
 import * as ContextMenu from "../components/context-menu/context-menu";
 import { ArchiveIcon, CrumpledPaperIcon, DashboardIcon, FileIcon, InputIcon, ListBulletIcon } from "@radix-ui/react-icons";
 import * as TogglePrimitive from "@radix-ui/react-toggle"
@@ -28,7 +28,7 @@ export const Page: React.FC = () => {
     selectedFiles,
     rename,
     startRenaming
-  } = useFileExplorer({
+  } = useFileExplorerLegacy({
       defaultFiles: generateFolderData()
   })
 
