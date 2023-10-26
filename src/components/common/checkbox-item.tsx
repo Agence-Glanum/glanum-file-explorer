@@ -4,10 +4,9 @@ import * as ContextMenu from "@radix-ui/react-context-menu";
 
 import { CheckIcon } from "@radix-ui/react-icons";
 import { ContextMenuItemProps } from "../../types/context-menu";
-import useCheckbox from "../../hooks/useCheckbox";
 
-function CheckboxItem({key, item, index, state}: ContextMenuItemProps) {
-  const handleCheckbox = useCheckbox(index, !state.checked);
+function CheckboxItem({key, item, index, state, handleContextMenu}: ContextMenuItemProps) {
+    console.log("in child : ", state, handleContextMenu)
     return (
         <>
         <ContextMenu.CheckboxItem
@@ -15,7 +14,7 @@ function CheckboxItem({key, item, index, state}: ContextMenuItemProps) {
             key={key}
             checked={state.checked}
             onCheckedChange={() => {
-                handleCheckbox()
+                handleContextMenu(index, !state.checked, "checked")
             }}
             disabled={state.isDisabled}
         >

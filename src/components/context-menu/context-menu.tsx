@@ -5,11 +5,10 @@ import { ContextMenuProps, Item } from "../../types/context-menu";
 import CheckboxItem from "../common/checkbox-item";
 import DefaultItem from "../common/default-item";
 import RadioItem from "../common/radio-item";
-import { useContextMenuStore } from "../../store/context-menu";
+import useContextMenu from "../../hooks/useContextMenu";
 
 function ContextMenuComponent({ data: mock, TriggerComponent }: ContextMenuProps) {
-  const itemsState = useContextMenuStore((state) => state.items)
-
+  const {items, handleContextMenu} = useContextMenu()
   return (
     <ContextMenu.Root>
       <ContextMenu.Trigger className="ContextMenuTrigger">
@@ -23,11 +22,11 @@ function ContextMenuComponent({ data: mock, TriggerComponent }: ContextMenuProps
         >
           {mock?.map((item: Item, index: number) => {
             if (item.isItem) {
-              return <DefaultItem key={item.name} item={item} index={index} state={itemsState[index]} />
+              return <DefaultItem key={item.name} item={item} index={index} state={items[index]} handleContextMenu={handleContextMenu} />
             } else if (item.isCheckbox) {
-              return <CheckboxItem key={item.name} item={item} index={index} state={itemsState[index]} />
+              return <CheckboxItem key={item.name} item={item} index={index} state={items[index]} handleContextMenu={handleContextMenu} />
             } else if (item.isRadio) {
-              return <RadioItem key={item.name} item={item} index={index} state={itemsState[index]} />
+              return <RadioItem key={item.name} item={item} index={index} state={items[index]} handleContextMenu={handleContextMenu} />
             }
           })}
         </ContextMenu.Content>

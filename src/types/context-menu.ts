@@ -16,15 +16,18 @@ export type ContextMenuProps = {
     TriggerComponent: React.FC
   }
 
-  export type ContextMenuItemProps = {
-    key: string
-    item: Item
-    index: number
-    state: ItemState
-  }
+export type ContextMenuItemProps = {
+  key: string
+  item: Item
+  index: number
+  state: ItemState
+  handleContextMenu: HandleContextMenu
+}
 
-  export type ItemState = {
-    isDisabled?: boolean
-    checked?: boolean
-    radioValue?: string
-  }
+type HandleContextMenu = (index: number, value: boolean|string, key: string) => void
+
+export type ItemState = {
+  isDisabled?: boolean
+  checked?: boolean
+  radioValue?: string
+}
