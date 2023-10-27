@@ -25,7 +25,10 @@ export const V2: React.FC = () => {
         updateFile,
         createTempFile,
         selectedFiles,
-        selectFile
+        selectFile,
+        isFileSelected,
+        toggleSelectedFile,
+        hasManySelectedFiles
     } = useFileExplorer({
         defaultFolder: generateFolder({canRoot: true})
     })
@@ -207,13 +210,23 @@ export const V2: React.FC = () => {
                                 }
                                 }}
                                 onClick={(e) => {
+                                    e.stopPropagation();
+                                    
+                                    if (e.ctrlKey) {
+                                        toggleSelectedFile(file)
+                                        return
+                                    }
                                     selectFile(file)
                                 }}
                                 className="py-1 px-2"
                             >
                                 <ContextMenu.Root>
                                 <ContextMenu.Trigger asChild>
-                                    <div title={file.name} className="py-2 px-4 flex flex-col justify-center items-center border whitespace-nowrap rounded cursor-pointer ">
+                                    <div
+                                        title={file.name}
+                                        className={clsx(isFileSelected(file.id) && "outline outline-offset-2 outline-2" , "py-2 px-4 flex flex-col justify-center items-center border whitespace-nowrap rounded cursor-pointer ")}
+                                        
+                                    >
                                     {file.type === "folder" ? (
                                         <ArchiveIcon className="h-16 w-16 text-gray-600" />
                                     ): null}
@@ -246,31 +259,42 @@ export const V2: React.FC = () => {
                                     </div>
                                 </ContextMenu.Trigger>
                                     <ContextMenu.Content>
-                                    {file.type === "folder" ? (
                                         <ContextMenu.Item
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            updateFolder(generateFolder({
-                                                folderId: file.id, 
-                                                parentFolderId: file.meta?.parentDirId,
-                                                baseFolder: {
-                                                    name: file.name
-                                                }
-                                            }), {})
-                                            selectFolder(file.id)
-                                            openFolder(file.id)
-                                        }}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+
+                                                toggleSelectedFile(file)
+                                            }}
                                         >
-                                        Open
+                                            {isFileSelected(file.id) ? "Unselect": "Select"}
                                         </ContextMenu.Item>
-                                    ): null}
-                                        <ContextMenu.Item
-                                        onClick={() => {
-                                            setRenaming(file)
-                                        }}
-                                    >
-                                        Rename
-                                    </ContextMenu.Item>
+                                        {file.type === "folder" && !(isFileSelected(file.id) && hasManySelectedFiles) ? (
+                                            <ContextMenu.Item
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                updateFolder(generateFolder({
+                                                    folderId: file.id, 
+                                                    parentFolderId: file.meta?.parentDirId,
+                                                    baseFolder: {
+                                                        name: file.name
+                                                    }
+                                                }), {})
+                                                selectFolder(file.id)
+                                                openFolder(file.id)
+                                            }}
+                                            >
+                                            Open
+                                            </ContextMenu.Item>
+                                        ): null}
+                                        {!(isFileSelected(file.id) && hasManySelectedFiles) ? (
+                                            <ContextMenu.Item
+                                                onClick={() => {
+                                                    setRenaming(file)
+                                                }}
+                                            >
+                                                Rename
+                                            </ContextMenu.Item>
+                                        ) : null}
                                     </ContextMenu.Content>
                                 </ContextMenu.Root>
                             </FolderContentExplorer.GridItem>

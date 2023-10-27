@@ -67,12 +67,6 @@ export function useFileExplorer({defaultFolder}: Props) {
         await focusFolder(updatedFolder.id)
     }
 
-    const selectFile = (file: File|File[]) => {
-        const files = Array.isArray(file) ? file : [file]
-
-        setSelectedFiles(files)
-    }
-
     const updateFile = (file: File) => {
         setStore(produce((draft) => {
             const id = file.meta?.oldId ?? file.id
@@ -89,6 +83,24 @@ export function useFileExplorer({defaultFolder}: Props) {
                 Object.assign(foundFile, file)
             }
         }))
+    }
+
+    const selectFile = (file: File|File[]) => {
+        const files = Array.isArray(file) ? file : [file]
+
+        setSelectedFiles(files)
+    }
+
+    const toggleSelectedFile = (file: File) => {
+        setSelectedFiles((state) => {
+            const foundFile = state.find((stateFile)  => stateFile.id === file.id)
+
+            if (foundFile) {
+                return state.filter((stateFile)  => stateFile.id !== file.id)
+            }
+            
+            return [...state, file]
+        })
     }
 
     const createTempFile = (
@@ -141,6 +153,12 @@ export function useFileExplorer({defaultFolder}: Props) {
          })
     }
 
+    const isFileSelected = (fileId: string) => {
+        return selectedFiles.find((selectFile) => selectFile.id === fileId) !== undefined
+    }
+
+    const hasManySelectedFiles = selectedFiles.length > 1
+
     const currentFolder = store.find(((folder) => folder.id === currentFolderId)) ?? null
 
     const currentFolderContent = currentFolder ? (currentFolder as FolderFiles).files ?? [] : []
@@ -155,6 +173,9 @@ export function useFileExplorer({defaultFolder}: Props) {
         createTempFolder,
         createTempFile,
         selectedFiles,
-        selectFile
+        selectFile,
+        isFileSelected,
+        hasManySelectedFiles,
+        toggleSelectedFile
     }
 }
