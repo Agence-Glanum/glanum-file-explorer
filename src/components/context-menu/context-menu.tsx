@@ -7,20 +7,20 @@ import DefaultItem from "../common/default-item";
 import RadioItem from "../common/radio-item";
 import useContextMenu from "../../hooks/useContextMenu";
 
-function ContextMenuComponent({ data: mock, TriggerComponent }: ContextMenuProps) {
+function ContextMenuComponent({ data, TriggerComponent }: ContextMenuProps) {
   const {items, handleContextMenu} = useContextMenu()
-  return (
+ return (
     <ContextMenu.Root>
-      <ContextMenu.Trigger className="ContextMenuTrigger">
+      <ContextMenu.Trigger className={data.triggerComponentClasse}>
         <TriggerComponent />
       </ContextMenu.Trigger>
       <ContextMenu.Portal>
         <ContextMenu.Content
-          className="ContextMenuContent"
+          className={data.contentClasse}
           sideOffset={5}
           align="end"
         >
-          {mock?.map((item: Item, index: number) => {
+          {data.mock?.map((item: Item, index: number) => {
             if (item.isItem) {
               return <DefaultItem key={item.name} item={item} index={index} state={items[index]} handleContextMenu={handleContextMenu} />
             } else if (item.isCheckbox) {

@@ -1,5 +1,3 @@
-import "../../styles/style.css"
-
 import * as ContextMenu from "@radix-ui/react-context-menu";
 
 import { ContextMenuItemProps } from "../../types/context-menu";
@@ -8,7 +6,7 @@ import { DotFilledIcon } from "@radix-ui/react-icons";
 function RadioItem({key, item, index, state, handleContextMenu}: ContextMenuItemProps) {
     return (
         <>
-            <ContextMenu.Label className="ContextMenuLabel">
+            <ContextMenu.Label className={item.labelGroupClasse}>
                 {item.radioGroupName}
             </ContextMenu.Label>
             <ContextMenu.RadioGroup
@@ -21,11 +19,11 @@ function RadioItem({key, item, index, state, handleContextMenu}: ContextMenuItem
             {item.radioEntries?.map((entry: string) => {
                 return (
                 <ContextMenu.RadioItem
-                    className="ContextMenuRadioItem"
+                    className={item.radioClasse}
                     value={entry}
                     key={entry}
                 >
-                    <ContextMenu.ItemIndicator className="ContextMenuItemIndicator">
+                    <ContextMenu.ItemIndicator className={item.itemIndicator}>
                         <DotFilledIcon />
                     </ContextMenu.ItemIndicator>
                     {entry}
@@ -33,7 +31,7 @@ function RadioItem({key, item, index, state, handleContextMenu}: ContextMenuItem
                 )
             })}
             </ContextMenu.RadioGroup>
-            {item.isSeparated ? <ContextMenu.Separator className="ContextMenuSeparator" /> : null }
+            {item.isSeparated ? <ContextMenu.Separator className={item.separatorClasse} /> : null }
         </>
     
     );

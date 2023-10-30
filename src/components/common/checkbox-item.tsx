@@ -1,29 +1,26 @@
-import "../../styles/style.css"
-
 import * as ContextMenu from "@radix-ui/react-context-menu";
 
 import { CheckIcon } from "@radix-ui/react-icons";
 import { ContextMenuItemProps } from "../../types/context-menu";
 
 function CheckboxItem({key, item, index, state, handleContextMenu}: ContextMenuItemProps) {
-    console.log("in child : ", state, handleContextMenu)
     return (
         <>
         <ContextMenu.CheckboxItem
-            className="ContextMenuCheckboxItem"
+            className={item.checkboxClasse}
             key={key}
-            checked={state.checked}
+            checked={state.checkboxValue}
             onCheckedChange={() => {
-                handleContextMenu(index, !state.checked, "checked")
+                handleContextMenu(index, !state.checkboxValue, "checkboxValue")
             }}
             disabled={state.isDisabled}
         >
-            <ContextMenu.ItemIndicator className="ContextMenuItemIndicator">
+            <ContextMenu.ItemIndicator className={item.itemIndicator}>
                 <CheckIcon />
             </ContextMenu.ItemIndicator>
             {item.name}
         </ContextMenu.CheckboxItem>
-        {item.isSeparated ? <ContextMenu.Separator className="ContextMenuSeparator" /> : null }
+        {item.isSeparated ? <ContextMenu.Separator className={item.separatorClasse} /> : null }
         </>
     
     );

@@ -4,15 +4,21 @@ export type Item = {
     disabled?: boolean
     onclick?: React.MouseEventHandler
     isSeparated?: boolean
+    separatorClasse?: string
     isItem?: boolean
+    itemClasse?: string
     isCheckbox?: boolean
+    checkboxClasse?: string
     isRadio?: boolean
+    radioClasse?: string
     radioGroupName?: string
+    labelGroupClasse?: string
     radioEntries?: string[] | undefined
+    itemIndicator?: string
 }
 
 export type ContextMenuProps = {
-    data: Item[]
+    data: ContextMenuMock
     TriggerComponent: React.FC
   }
 
@@ -28,6 +34,13 @@ type HandleContextMenu = (index: number, value: boolean|string, key: string) => 
 
 export type ItemState = {
   isDisabled?: boolean
-  checked?: boolean
+  checkboxValue?: boolean
   radioValue?: string
+}
+
+export type ContextMenuMock = {
+  triggerComponentClasse: string
+  contentClasse: string
+  subContentClasse: string
+  mock: Item[]
 }

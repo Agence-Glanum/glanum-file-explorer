@@ -6,10 +6,10 @@ const useContextMenu = () => {
         isDisabled: false,
     },
     {
-        checked: false
+        checkboxValue: false
     },
     {
-        checked: true,
+        checkboxValue: true,
         isDisabled: true
     },
     {
