@@ -15,6 +15,12 @@ export type Item = {
     labelGroupClasse?: string
     radioEntries?: string[] | undefined
     itemIndicator?: string
+    subTriggerClasse?: string
+    subTriggerContainerClasse?: string
+    subContentClasse?: string
+    sideOffset?: number
+    alignOffset?: number
+    groupData?: Item[]
 }
 
 export type ContextMenuProps = {
@@ -26,11 +32,12 @@ export type ContextMenuItemProps = {
   key: string
   item: Item
   index: number
+  groupIndex?: number
   state: ItemState
   handleContextMenu: HandleContextMenu
 }
 
-type HandleContextMenu = (index: number, value: boolean|string, key: string) => void
+type HandleContextMenu = (index: number,  value: boolean|string, key: string, subIndex?: number) => void
 
 export type ItemState = {
   isDisabled?: boolean
@@ -39,8 +46,10 @@ export type ItemState = {
 }
 
 export type ContextMenuMock = {
+  data?: Item[]
   triggerComponentClasse: string
-  contentClasse: string
-  subContentClasse: string
-  mock: Item[]
+  contentClasse: string  
+  sideOffset: number
+  alignOffset?: number
+  align: string
 }

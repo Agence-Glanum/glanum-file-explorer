@@ -3,7 +3,7 @@ import * as ContextMenu from "@radix-ui/react-context-menu";
 import { ContextMenuItemProps } from "../../types/context-menu";
 import { DotFilledIcon } from "@radix-ui/react-icons";
 
-function RadioItem({key, item, index, state, handleContextMenu}: ContextMenuItemProps) {
+function RadioItem({key, item, index, groupIndex, state, handleContextMenu}: ContextMenuItemProps) {
     return (
         <>
             <ContextMenu.Label className={item.labelGroupClasse}>
@@ -13,7 +13,7 @@ function RadioItem({key, item, index, state, handleContextMenu}: ContextMenuItem
                 key={key}
                 value={state.radioValue}
                 onValueChange={(value) => {
-                    handleContextMenu(index, value, "radioValue")
+                    handleContextMenu(index, value, "radioValue", groupIndex)
                 }}
             >
             {item.radioEntries?.map((entry: string) => {
