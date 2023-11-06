@@ -1,8 +1,5 @@
 import { ContextMenuMock } from "../types/context-menu";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-//custom hook
-
 const contextMenuMock: ContextMenuMock = {
     triggerComponentClasse: "block border-2 border-white border-dashed text-white rounded text-[15px] select-none py-[45px] w-[300px] text-center",
     contentClasse: "min-w-[220px] bg-white rounded-md overflow-hidden p-[5px] shadow-[0px_10px_38px_-10px_rgba(22,_23,_24,_0.35),_0px_10px_20px_-15px_rgba(22,_23,_24,_0.2)]",
@@ -37,7 +34,7 @@ const contextMenuMock: ContextMenuMock = {
                 {
                     name: 'item checkbox 2',
                     disabled: true,
-                    isSeparated: true,
+                    isSeparated: false,
                     separatorClasse: "h-[1px] bg-violet6 m-[5px]",
                     isCheckbox: true,
                     checkboxClasse: "group text-[13px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[5px] relative pl-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 data-[highlighted]:text-violet1"         

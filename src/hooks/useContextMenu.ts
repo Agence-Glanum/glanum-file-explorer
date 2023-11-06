@@ -12,7 +12,7 @@ const useContextMenu = () => {
   const [items, setItems] = useState([
     {
         isDisabled: false,
-    },
+    }, 
     [
       {
         checkboxValue: false
@@ -20,7 +20,7 @@ const useContextMenu = () => {
       {
           checkboxValue: true,
           isDisabled: true
-      },
+      }     
     ],
     {
         radioValue: "slot 1",
@@ -32,14 +32,8 @@ const useContextMenu = () => {
 
   const handleContextMenu = (index: number, value: boolean|string, key: string, groupIndex?: number) => {
     const newItems: stateItems = items;
-    if(groupIndex){
-      console.log("enter in group")
-      console.log("check 1 : ", newItems[index])
-      console.log("check 2 : ", newItems[index][groupIndex])
-      console.log("check 3 : ", newItems[index][groupIndex][`${key}`])
-      console.log("check value : ", value)
+    if(!groupIndex){
       newItems[index][groupIndex][`${key}`] = value
-
     }
     newItems[index][`${key}`] = value
 
