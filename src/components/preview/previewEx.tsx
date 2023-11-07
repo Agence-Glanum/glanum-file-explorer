@@ -3,8 +3,10 @@ import Preview from "./preview";
 
 const PreviewEx = () => {
   const [file, setFile] = useState<any>("");
+
   const placeHolder =
     "https://festival-avignon.com/storage/image/35/337235_642c26b14f967.jpeg";
+
   const data = [
     {
       label: "video",
@@ -43,7 +45,7 @@ const PreviewEx = () => {
               <button
                 key={i}
                 onClick={() => {
-                  setFile(el.filePath);
+                  setFile(el);
                 }}
                 className="bg-[#9797bf] border inline-block cursor-pointer text-white text-[17px] no-underline px-[31px] py-4 rounded-[28px] border-solid hover:bg-gray-700 active:relative active:top-px;
                 "
@@ -53,9 +55,9 @@ const PreviewEx = () => {
             );
           })}
         </div>
-        <h4 className="text-sm italic text-right">{file}</h4>
+        <h4 className="text-sm italic text-right">{file.filePath}</h4>
       </div>
-      <Preview file={file} placeHolder={placeHolder}></Preview>
+      <Preview file={file} placeHolder={placeHolder} />
     </div>
   );
 };
