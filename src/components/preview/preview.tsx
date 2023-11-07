@@ -1,29 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-const allowedExtensions = {
-  video: [
-    "3g2",
-    "3gp",
-    "avi",
-    "flv",
-    "m4v",
-    "mkv",
-    "mov",
-    "mp4",
-    "mpeg",
-    "mpg",
-    "ogv",
-    "rm",
-    "rmvb",
-    "swf",
-    "vob",
-    "webm",
-    "wmv",
-  ],
-  text: ["txt", "doc", "docx", "odt", "pdf", "rtf", "tex", "wpd", "wps"],
-  image: ["bmp", "gif", "jpg", "jpeg", "png", "svg", "tiff", "webp"],
-  music: ["aac", "flac", "m4a", "mp3", "ogg", "wav", "wma"],
-};
+import {
+  FileAudio,
+  FileImage,
+  FileQuestion,
+  FileText,
+  FileVideo,
+} from "lucide-react";
+import { allowedExtensions } from "./assets/data-extension";
+import image from "./assets/img.png";
 
 const getFileExtension = (filepath: string, allowedExtensions: any) => {
   if (!filepath) return "";
@@ -34,25 +18,27 @@ const getFileExtension = (filepath: string, allowedExtensions: any) => {
 
     for (const category in allowedExtensions) {
       if (allowedExtensions[category].includes(extension)) {
-        return `L'extension "${extension}" est autorisée pour la catégorie ${category}.`;
+        if (category === "video") return <FileVideo />;
+        if (category === "text") return <FileText />;
+        if (category === "music") return <FileAudio />;
+        if (category === "image") return <FileImage />;
       }
     }
-    
-    return `L'extension "${extension}" n'est pas autorisée.`;
+
+    return <FileQuestion />;
   } else {
-    return "Aucune extension trouvée.";
+    return <img src={image} alt="no-extension" style={{ width: "50px" }} />;
   }
 };
-
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Preview = ({ file, placeHolder }: { file: any; placeHolder: string }) => {
   return (
     <div className="flex flex-col border-black border rounded-lg p-6 mt-4">
       <h1>Preview file</h1>
-      <p>
-        Extension : {getFileExtension(file.filePath, allowedExtensions)}{" "}
-      </p>
+      {/* <p>Extension : {getFileExtension(file.filePath, allowedExtensions)} </p> */}
+      {/* <img src={image} alt="no-extension"></img> */}
+      {getFileExtension(file.filePath, allowedExtensions)}
     </div>
   );
 };
