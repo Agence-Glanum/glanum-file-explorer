@@ -21,7 +21,7 @@ const PreviewEx = () => {
       filePath: "txt.txt",
     },
     {
-      label: "image croissants",
+      label: "empty",
       filePath: "",
     },
     {
@@ -47,8 +47,7 @@ const PreviewEx = () => {
                 onClick={() => {
                   setFile(el);
                 }}
-                className="bg-[#9797bf] border inline-block cursor-pointer text-white text-[17px] no-underline px-[31px] py-4 rounded-[28px] border-solid hover:bg-gray-700 active:relative active:top-px;
-                "
+                className="bg-[#9797bf] border inline-block cursor-pointer text-white text-[17px] no-underline px-[31px] py-4 rounded-[28px] border-solid hover:bg-gray-700 active:relative active:top-px"
               >
                 {el.label}
               </button>
