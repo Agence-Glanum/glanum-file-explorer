@@ -5,7 +5,7 @@ import { FolderFiles, File } from "../types/file"
 import { convertToInternalFiles } from "../utils/convert-to-internal-files"
 
 type Props = {
-    defaultFolder: FolderFiles,
+    defaultFolder?: FolderFiles,
 }
 
 export function useFileExplorer({defaultFolder}: Props) {
@@ -14,10 +14,12 @@ export function useFileExplorer({defaultFolder}: Props) {
     const [selectedFiles, setSelectedFiles] = useState<Array<File>>([])
 
     useEffect(() => {
-        setStore(produce((store) => {
-            store.push(convertToInternalFiles(defaultFolder))
-        }))
-        setCurrentFolderId(defaultFolder.id)
+        if (defaultFolder) {
+            setStore(produce((store) => {
+                store.push(convertToInternalFiles(defaultFolder))
+            }))
+            setCurrentFolderId(defaultFolder.id)
+        }
     }, [])
 
 
@@ -44,14 +46,14 @@ export function useFileExplorer({defaultFolder}: Props) {
                 return 
             }
 
-            const childIndex = store.findIndex((folder) => folder.id === updatedFolder.meta?.parentDirId)
+            const childIndex = store.findIndex((folder) => folder.id === updatedFolder.metadata?.parentDirId)
 
             if (childIndex !== -1) {
                 store.splice(childIndex + 1, 0, convertToInternalFiles(updatedFolder))
                 return
             }
 
-            const parentIndex = store.findIndex((folder) => folder.meta?.parentDirId === updatedFolder.id)
+            const parentIndex = store.findIndex((folder) => folder.metadata?.parentDirId === updatedFolder.id)
 
             if (parentIndex !== -1) {
                 if (parentIndex === 0) {
@@ -68,21 +70,35 @@ export function useFileExplorer({defaultFolder}: Props) {
     }
 
     const updateFile = (file: File) => {
-        setStore(produce((draft) => {
-            const id = file.meta?.oldId ?? file.id
+        setStore((draft) => {
+            const id = file.metadata?.oldId ?? file.id
 
-            const foundFolder = draft.find((folder) => folder.id === file.meta?.parentDirId)
+            return draft.map((folder) => {
+                const foundFolder = folder.id === file.metadata?.parentDirId
 
-            if (!foundFolder) {
-                return
-            }
+                if (!foundFolder) {
+                    return folder
+                }
 
-            const foundFile = foundFolder.files.find((file) => file.id === id)
-            
-            if (foundFile) {
-                Object.assign(foundFile, file)
-            }
-        }))
+                const files = folder.files.map((f) => {
+                    const foundFile = f.id === id
+    
+                    if (!foundFile) {
+                        return f
+                    }
+
+                    return {
+                        ...f,
+                        ...file
+                    }
+                })
+
+                return {
+                    ...folder,
+                    files
+                }
+            })
+        })
     }
 
     const selectFile = (file: File|File[]) => {
@@ -123,9 +139,9 @@ export function useFileExplorer({defaultFolder}: Props) {
             name: defaultFile?.name ?? 'New File',
             sync: defaultFile?.sync ?? false,
             ...(defaultFile ?? {}),
-            meta: {
+            metadata: {
                 parentDirId: parentFolder.id,
-                ...(defaultFile?.meta ?? {})
+                ...(defaultFile?.metadata ?? {})
             },
             
         }

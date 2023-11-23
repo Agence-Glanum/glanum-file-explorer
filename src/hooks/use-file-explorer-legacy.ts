@@ -7,7 +7,7 @@ type File = {
     type: string
     name: string
     sync: boolean
-    meta?: {
+    metadata?: {
         url?: string
         parentDirId: string
         thumbnail?: string
@@ -80,7 +80,7 @@ const traverse = (
     }
 
     if (Array.isArray(parent) && folder.length !== 0){
-        parent = [...parent, folder[0].meta?.parentDirId ?? ""]
+        parent = [...parent, folder[0].metadata?.parentDirId ?? ""]
     } else {
         parent = [];
     }
@@ -153,7 +153,7 @@ export function useFileExplorerLegacy({defaultFiles}: Props) {
                 draft.push(folder.id)
             }
 
-            const parentFolder = searchInFiles(folder.meta?.parentDirId ?? "")
+            const parentFolder = searchInFiles(folder.metadata?.parentDirId ?? "")
 
             if (parentFolder) {
                 const index = draft.indexOf(parentFolder.id)
@@ -186,7 +186,7 @@ export function useFileExplorerLegacy({defaultFiles}: Props) {
 
     const updateFile = (file: InternalFile) => {
         setFiles(produce((draft) => {
-            const id = file.meta?.oldId ?? file.id
+            const id = file.metadata?.oldId ?? file.id
 
             const foundFile = searchInFiles(id, draft)
 
@@ -215,7 +215,7 @@ export function useFileExplorerLegacy({defaultFiles}: Props) {
             name: defaultName,
             sync: false,
             renaming: true,
-            meta: {
+            metadata: {
                 parentDirId: parentFolder.id
             },
             children: []
@@ -251,7 +251,7 @@ export function useFileExplorerLegacy({defaultFiles}: Props) {
             name: defaultName,
             sync: false,
             renaming: true,
-            meta: {
+            metadata: {
                 parentDirId: parentFolder.id
             },
             children: []

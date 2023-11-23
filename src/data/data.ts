@@ -11,7 +11,7 @@ const generateFilesData = (parentFolderId: string, folderWeight: number = 20): (
                 name: faker.system.commonFileName(),
                 type: 'file',
                 sync: true,
-                meta: {
+                metadata: {
                     parentDirId: parentFolderId
                 }
             }
@@ -24,7 +24,7 @@ const generateFilesData = (parentFolderId: string, folderWeight: number = 20): (
                 type: 'folder',
                 root: false,
                 sync: true,
-                meta: {
+                metadata: {
                     parentDirId: parentFolderId
                 }
             }}, 
@@ -33,7 +33,7 @@ const generateFilesData = (parentFolderId: string, folderWeight: number = 20): (
                 name: faker.system.commonFileName(),
                 type: 'file',
                 sync: true,
-                meta: {
+                metadata: {
                     parentDirId: parentFolderId
                 }
             }}
@@ -76,7 +76,7 @@ const generateFolder = ({folderId, parentFolderId, child, baseFolder, canRoot = 
             root,
             sync: true,
             files,
-            meta: {
+            metadata: {
                 parentDirId: parentId
             }
         },

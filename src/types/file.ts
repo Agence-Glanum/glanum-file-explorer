@@ -3,7 +3,7 @@ export type File = {
     type: string
     name: string
     sync: boolean
-    meta?: {
+    metadata?: {
         url?: string
         parentDirId: string
         thumbnail?: string

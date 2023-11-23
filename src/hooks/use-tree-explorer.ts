@@ -13,7 +13,7 @@ export function useTreeExplorer({store}: TreeExplorerProps) {
 
     useEffect(() => {
         if (!first && store.length !== 0) {
-            const parentDirId = store[0].meta?.parentDirId ?? ""
+            const parentDirId = store[0].metadata?.parentDirId ?? ""
 
             setSelectedFolder([store[0].id])
             setOpenFolders([store[0].id, parentDirId])
@@ -34,7 +34,7 @@ export function useTreeExplorer({store}: TreeExplorerProps) {
                 draft.push({
                     id: folder.id,
                     name: folder.name, 
-                    parent: [folder.meta?.parentDirId ?? ""], 
+                    parent: [folder.metadata?.parentDirId ?? ""], 
                     depth
                 })
             }
