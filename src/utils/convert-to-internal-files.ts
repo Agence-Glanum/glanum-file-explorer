@@ -1,6 +1,6 @@
-import { FolderFiles, InternalFolderFiles } from "../types/file"
+import { FolderFiles } from "../types/file"
 
-export const convertToInternalFiles = (folder: FolderFiles): InternalFolderFiles => {
+export const convertToInternalFiles = (folder: FolderFiles): FolderFiles => {
     return {
         ...folder,
         files: folder.files.map((file) => {
