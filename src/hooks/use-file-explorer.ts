@@ -143,7 +143,8 @@ export function useFileExplorer({defaultFolder}: Props) {
                 parentDirId: parentFolder.id,
                 ...(defaultFile?.metadata ?? {})
             },
-            
+            created_at: new Date(),
+            updated_at: null
         }
 
         setStore(produce((draft) => {

@@ -1,4 +1,4 @@
-import { ColumnDef, Row, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table"
+import { ColumnDef, Row, createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table"
 import React from "react"
 import { File } from "../../../types/file"
 import { useVirtualizer } from "@tanstack/react-virtual"
@@ -18,15 +18,16 @@ const MixFileTable = observer(function MixFileTable({data, fetchNextPage}: MixFi
     const isLoading = state.filesState.loading.get()
     const totalCount = state.filesState.meta.total.get()
 
-    const columns = React.useMemo<ColumnDef<File>[]>(
-      () => [
-        {
-          accessorKey: 'name',
+    const columnHelper = createColumnHelper<File>()
+
+    const columns = [
+        columnHelper.accessor('name', {
           cell: info => info.getValue(),
-        },
-      ],
-      []
-    )
+        }),
+        columnHelper.accessor('updated_at', {
+          cell: info => info.getValue(),
+        }),
+    ]
   
     const totalFetched = data.length
   
@@ -34,7 +35,7 @@ const MixFileTable = observer(function MixFileTable({data, fetchNextPage}: MixFi
       (containerRefElement?: HTMLDivElement | null) => {
         if (containerRefElement) {
           const { scrollHeight, scrollTop, clientHeight } = containerRefElement
-        
+        //console.log(scrollHeight - scrollTop - clientHeight, {totalFetched, totalCount, isLoading})
           if (
             scrollHeight - scrollTop - clientHeight < 300 &&
             !isLoading &&
@@ -79,28 +80,25 @@ const MixFileTable = observer(function MixFileTable({data, fetchNextPage}: MixFi
         ? getTotalSize() - (virtualRows?.[virtualRows.length - 1]?.end || 0)
         : 0
   
-    if (isLoading) {
-      return <>Loading...</>
-    }
-  
     return (
       <div className="p-2">
         <div className="h-2" />
         <div
-          className="h-[500px]"
+          className="h-[500px] overflow-auto"
           onScroll={e => fetchMoreOnBottomReached(e.target as HTMLDivElement)}
           ref={tableContainerRef}
         >
-          <table>
-            <thead>
+          <table className="table-fixed w-full">
+            <thead className="sticky top-0">
               {table.getHeaderGroups().map(headerGroup => (
-                <tr key={headerGroup.id}>
+                <tr key={headerGroup.id} className="bg-gray-50 border-y border-gray-200">
                   {headerGroup.headers.map(header => {
                     return (
                       <th
                         key={header.id}
                         colSpan={header.colSpan}
                         style={{ width: header.getSize() }}
+                        className="p-3 text-xl text-left"
                       >
                         {header.isPlaceholder ? null : (
                           <div
@@ -139,7 +137,7 @@ const MixFileTable = observer(function MixFileTable({data, fetchNextPage}: MixFi
                   <tr key={row.id}>
                     {row.getVisibleCells().map(cell => {
                       return (
-                        <td key={cell.id}>
+                        <td key={cell.id} className="p-5 border-b border-gray-200">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()

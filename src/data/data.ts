@@ -13,7 +13,9 @@ const generateFilesData = (parentFolderId: string, folderWeight: number = 20): (
                 sync: true,
                 metadata: {
                     parentDirId: parentFolderId
-                }
+                },
+                created_at: new Date(),
+                updated_at: null
             }
         }
 
@@ -26,7 +28,9 @@ const generateFilesData = (parentFolderId: string, folderWeight: number = 20): (
                 sync: true,
                 metadata: {
                     parentDirId: parentFolderId
-                }
+                },
+                created_at: new Date(),
+                updated_at: null
             }}, 
             {weight: 100 - folderWeight, value: {
                 id: uuidv4(),
@@ -35,7 +39,9 @@ const generateFilesData = (parentFolderId: string, folderWeight: number = 20): (
                 sync: true,
                 metadata: {
                     parentDirId: parentFolderId
-                }
+                },
+                created_at: new Date(),
+                updated_at: null
             }}
         ])
     }).sort((file) => file.type === 'folder' ? -1 : 1)

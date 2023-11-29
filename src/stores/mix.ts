@@ -1,5 +1,6 @@
 import { observable } from "@legendapp/state";
 import { SortingState } from "@tanstack/react-table";
+import { File, FolderFiles } from "../types/file";
 
 interface DataState { 
     links?: {
@@ -26,12 +27,16 @@ interface DataState {
 }
 
 interface State {
+    url: string
+    renaming: File|null
     sorting: SortingState,
     foldersState: DataState,
     filesState: DataState
 }
 
-export const state = observable<State>({ 
+export const state = observable<State>({
+    url: "",
+    renaming: null,
     sorting: [],
     foldersState: {loading: false},
     filesState: {loading: false},
@@ -39,7 +44,7 @@ export const state = observable<State>({
 
 interface fetchParams {
     url: string
-    onSuccess: (data: any[]) => void
+    onSuccess: (data: FolderFiles) => void
 }
 
 export async function fetchFolders({url, onSuccess}: fetchParams)  {
@@ -55,12 +60,12 @@ export async function fetchFolders({url, onSuccess}: fetchParams)  {
     const data = await response.json()
 
     state.foldersState.set({
-        ...data.links,
-        ...data.meta,
+        links: data.links,
+        meta: data.meta,
         loading: false
     })
 
-    onSuccess(data.data)
+    onSuccess(data.data as FolderFiles)
 }
 
 export async function fetchFiles({url, onSuccess}: fetchParams)  {
@@ -76,10 +81,25 @@ export async function fetchFiles({url, onSuccess}: fetchParams)  {
     const data = await response.json()
 
     state.filesState.set({
-        ...data.links,
-        ...data.meta,
+        links: data.links,
+        meta: data.meta,
         loading: false
     })
 
-    onSuccess(data.data)
+    onSuccess(data.data as FolderFiles)
+}
+
+export async function renameFile({url, onSuccess, name}: {name: string} & fetchParams) {
+
+    const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        }, 
+        body: JSON.stringify({name})
+    })
+
+    const data = await response.json()
+
+    onSuccess(data.data as FolderFiles)
 }

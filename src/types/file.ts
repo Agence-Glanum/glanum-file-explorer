@@ -9,6 +9,8 @@ export type File = {
         thumbnail?: string
         oldId?: string
     }
+    created_at: Date
+    updated_at: Date|null
 }
 
 export interface Folder extends File {
