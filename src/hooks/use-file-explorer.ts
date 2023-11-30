@@ -196,3 +196,5 @@ export function useFileExplorer({defaultFolder}: Props) {
         toggleSelectedFile
     }
 }
+
+export type FileExplorerReturnType = ReturnType<typeof useFileExplorer>

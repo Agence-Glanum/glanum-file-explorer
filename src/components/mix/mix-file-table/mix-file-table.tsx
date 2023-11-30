@@ -1,16 +1,15 @@
-import { ColumnDef, Row, createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table"
+import { Row, createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table"
 import React from "react"
 import { File } from "../../../types/file"
 import { useVirtualizer } from "@tanstack/react-virtual"
 import { observer } from "@legendapp/state/react"
-import { state } from "../../../stores/mix"
+import { fetchFiles, state } from "../../../stores/mix"
+import { FileExplorerReturnType } from "../../../hooks/use-file-explorer"
+import { Skeleton } from "../../skeleton/skeleton"
 
-interface MixFileTableProps {
-    data: File[]
-    fetchNextPage: () => void
-}
+interface MixFileTableProps extends FileExplorerReturnType {}
 
-const MixFileTable = observer(function MixFileTable({data, fetchNextPage}: MixFileTableProps) {
+const MixFileTable = observer(function MixFileTable({currentFolderContent, updateFolder}: MixFileTableProps) {
 
     const tableContainerRef = React.useRef<HTMLDivElement>(null)
   
@@ -29,23 +28,26 @@ const MixFileTable = observer(function MixFileTable({data, fetchNextPage}: MixFi
         }),
     ]
   
-    const totalFetched = data.length
+    const totalFetched = currentFolderContent.length
+    const nextUrl = state.filesState.links.next.get()
   
     const fetchMoreOnBottomReached = React.useCallback(
       (containerRefElement?: HTMLDivElement | null) => {
         if (containerRefElement) {
           const { scrollHeight, scrollTop, clientHeight } = containerRefElement
-        //console.log(scrollHeight - scrollTop - clientHeight, {totalFetched, totalCount, isLoading})
           if (
             scrollHeight - scrollTop - clientHeight < 300 &&
             !isLoading &&
             totalFetched < totalCount
           ) {
-            fetchNextPage()
+            fetchFiles({
+                url: nextUrl, 
+                onSuccess: (data) => updateFolder(data, {partial: true})
+            })
           }
         }
       },
-      [isLoading, totalFetched, totalCount]
+      [isLoading, totalFetched, totalCount, nextUrl]
     )
   
     React.useEffect(() => {
@@ -53,7 +55,7 @@ const MixFileTable = observer(function MixFileTable({data, fetchNextPage}: MixFi
     }, [fetchMoreOnBottomReached])
   
     const table = useReactTable({
-      data,
+      data: currentFolderContent,
       columns,
       state: {
         sorting,
@@ -81,8 +83,12 @@ const MixFileTable = observer(function MixFileTable({data, fetchNextPage}: MixFi
         : 0
   
     return (
-      <div className="p-2">
-        <div className="h-2" />
+      <>
+        <div className="mt-1 space-y-2">
+          {isLoading && currentFolderContent.length === 0? [...Array(15).keys()].map(() => (
+            <Skeleton className="h-[50px] w-full"/>
+          )): null}
+        </div>
         <div
           className="h-[500px] overflow-auto"
           onScroll={e => fetchMoreOnBottomReached(e.target as HTMLDivElement)}
@@ -156,7 +162,8 @@ const MixFileTable = observer(function MixFileTable({data, fetchNextPage}: MixFi
             </tbody>
           </table>
         </div>
-      </div>
+      </>
+      
     )
 })
 

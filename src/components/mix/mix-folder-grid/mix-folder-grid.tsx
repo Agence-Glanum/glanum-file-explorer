@@ -2,32 +2,29 @@ import { observer } from "@legendapp/state/react";
 import * as ContextMenu from "../../context-menu/context-menu";
 import * as FolderContentExplorer from "../../folder-content-explorer/folder-content-explorer";
 import { ArchiveIcon, DotsVerticalIcon } from "@radix-ui/react-icons";
-import { File, Folder, FolderFiles } from "../../../types/file";
+import { File, FolderFiles } from "../../../types/file";
 import { fetchFiles, fetchFolders, renameFile, state } from "../../../stores/mix";
 import { KeyboardEvent } from "react";
+import { FileExplorerReturnType } from "../../../hooks/use-file-explorer";
+import { Skeleton } from "../../skeleton/skeleton";
 
-interface MixFolderGridProps {
-    data: Folder[]
-    updateFile: (file: File) => void
-    currentFolder: FolderFiles|null
-    isFileSelected: (file: string) => boolean
-    hasManySelectedFiles: boolean
-    updateFolders: (folder: FolderFiles, {}) => void
+interface MixFolderGridProps extends FileExplorerReturnType {
     updateFiles: (folder: FolderFiles, {}) => void
 }
 
 const MixFolderGrid = observer(function MixFolderGrid({
-    data,
+    currentFolderContent,
     updateFile,
     currentFolder,
     isFileSelected, 
     hasManySelectedFiles,
-    updateFolders,
+    updateFolder,
     updateFiles
 }: MixFolderGridProps) {
 
     const renaming = state.renaming.get()
     const url = state.url.get()
+    const loading = state.foldersState.loading.get()
 
     const onRenamePressEnter = (e: KeyboardEvent<HTMLInputElement>, folder: File) => {
         if(e.key === 'Enter'){
@@ -72,7 +69,7 @@ const MixFolderGrid = observer(function MixFolderGrid({
       
         fetchFolders({
             url: `${url}/folders/${folder.id}/files?filter[type]=folder`, 
-            onSuccess: (data) => updateFolders(data, {})
+            onSuccess: (data) => updateFolder(data, {})
         })
     }
 
@@ -80,7 +77,7 @@ const MixFolderGrid = observer(function MixFolderGrid({
         <div>
             <h3 className="font-semibold">Dossiers</h3>
             <div className="mt-2 grid grid-cols-5 gap-6">
-                {data.map((folder) => (
+                {currentFolderContent.map((folder) => (
                     <ContextMenu.Root>
                         <ContextMenu.Trigger asChild>
                             <div key={folder.id} className="p-3 border border-gray-300 rounded">
@@ -122,6 +119,9 @@ const MixFolderGrid = observer(function MixFolderGrid({
                         </ContextMenu.Content>
                     </ContextMenu.Root>
                 ))}
+                {loading && currentFolderContent.length === 0 ? [...Array(15).keys()].map(() => (
+                    <Skeleton className="h-[50px]"/>
+                )): null}
             </div>
         </div>
     )
