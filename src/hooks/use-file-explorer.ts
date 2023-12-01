@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { produce } from "immer"
 import { v4 } from "uuid"
-import { FolderFiles, File } from "../types/file"
+import { FolderFiles, File, Folder } from "../types/file"
 import { convertToInternalFiles } from "../utils/convert-to-internal-files"
 
 type Props = {
@@ -174,6 +174,31 @@ export function useFileExplorer({defaultFolder}: Props) {
         return selectedFiles.find((selectFile) => selectFile.id === fileId) !== undefined
     }
 
+    const removeFile = (file: File) => {
+        setStore((draft) => {
+            const id = file.metadata?.oldId ?? file.id
+
+            return draft.map((folder) => {
+                const foundFolder = folder.id === file.metadata?.parentDirId
+
+                if (!foundFolder) {
+                    return folder
+                }
+
+                const files = folder.files.filter((f) => f.id !== id)
+
+                return {
+                    ...folder,
+                    files
+                }
+            })
+        })
+    }
+
+    const folderExists = (folder: File) => {
+        return store.find((f) => f.id === folder.id) !== undefined
+    }
+
     const hasManySelectedFiles = selectedFiles.length > 1
 
     const currentFolder = store.find(((folder) => folder.id === currentFolderId)) ?? null
@@ -193,7 +218,9 @@ export function useFileExplorer({defaultFolder}: Props) {
         selectFile,
         isFileSelected,
         hasManySelectedFiles,
-        toggleSelectedFile
+        toggleSelectedFile,
+        removeFile,
+        folderExists
     }
 }
 

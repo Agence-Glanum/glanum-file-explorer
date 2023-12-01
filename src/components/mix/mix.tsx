@@ -6,13 +6,11 @@ import MixFileTable from "./mix-file-table/mix-file-table";
 import { observer } from "@legendapp/state/react";
 import MixFolderGrid from "./mix-folder-grid/mix-folder-grid";
 import MixFileGrid from "./mix-file-grid/mix-file-grid";
-import { ToggleGroup, ToggleGroupItem } from "../toggle-group/toggle-group";
-import { DashboardIcon, TextAlignLeftIcon } from "@radix-ui/react-icons";
+import MixFileToolbar from "./mix-file-toolbar/mix-file-toolbar";
 
 const Mix = observer(function Mix({url}: {url: string}) {
-    const [layout, setLayout] = useState<'list'|'grid'>('grid')
-
     const sorting = state.sorting.get()
+    const layout = state.layout.get()
 
     const filesExplorer = useFileExplorer({})
 
@@ -40,13 +38,6 @@ const Mix = observer(function Mix({url}: {url: string}) {
         state.url.set(url)
     }, [url])
 
-    const onLayoutChange = (value: string) => {
-        if (value === "") {
-            return
-        }
-        setLayout(value as "list"|"grid")
-    }
-
     const onFileDropped = (files: Array<any>) => {
         const currenFolder = filesExplorer.currentFolder
         if (!currenFolder) {
@@ -73,18 +64,8 @@ const Mix = observer(function Mix({url}: {url: string}) {
                     updateFiles={filesExplorer.updateFolder}
                 />
                 <div className="mt-10">
-                    <div className="flex justify-between">
-                        <h3 className="font-semibold">Fichiers</h3>
-                        <ToggleGroup type="single" value={layout} onValueChange={onLayoutChange}>
-                            <ToggleGroupItem value="grid" aria-label="Grid layout">
-                                <DashboardIcon className="w-4 h-4" />
-                            </ToggleGroupItem>
-                            <ToggleGroupItem value="list" aria-label="List layout">
-                                <TextAlignLeftIcon className="w-4 h-4" />
-                            </ToggleGroupItem>
-                        </ToggleGroup>
-                    </div>
-                    
+                    <MixFileToolbar />
+
                     {layout === "grid" ? (
                         <MixFileGrid {...filesExplorer} />
                     ): null}

@@ -3,11 +3,11 @@ import { observer } from "@legendapp/state/react";
 import { FileExplorerReturnType } from "../../../hooks/use-file-explorer";
 import * as Virtualizer from "../../virtualizer/virtualizer";
 import * as FolderContentExplorer from "../../folder-content-explorer/folder-content-explorer";
-import * as ContextMenu from "../../context-menu/context-menu";
 import { FileIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { fetchFiles, renameFile, state } from "../../../stores/mix";
 import { File } from "../../../types/file";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../../context-menu/context-menu";
 
 interface MixFileGridProps extends FileExplorerReturnType {}
 
@@ -99,8 +99,8 @@ const MixFileGrid = observer(function MixFileGrid({
                     }}
                     className="py-1 px-2"
                 >
-                    <ContextMenu.Root>
-                    <ContextMenu.Trigger asChild>
+                    <ContextMenu>
+                    <ContextMenuTrigger asChild>
                         <div
                             title={file.name}
                             className={clsx(isFileSelected(file.id) && "outline outline-offset-2 outline-2" , "py-2 px-4 flex flex-col justify-center items-center border whitespace-nowrap rounded cursor-pointer ")} 
@@ -120,9 +120,9 @@ const MixFileGrid = observer(function MixFileGrid({
                         )}
                         
                         </div>
-                    </ContextMenu.Trigger>
-                        <ContextMenu.Content>
-                            <ContextMenu.Item
+                    </ContextMenuTrigger>
+                        <ContextMenuContent>
+                            <ContextMenuItem
                                 onClick={(e) => {
                                     e.stopPropagation()
 
@@ -130,18 +130,18 @@ const MixFileGrid = observer(function MixFileGrid({
                                 }}
                             >
                                 {isFileSelected(file.id) ? "Unselect": "Select"}
-                            </ContextMenu.Item>
+                            </ContextMenuItem>
                             {!(isFileSelected(file.id) && hasManySelectedFiles) ? (
-                                <ContextMenu.Item
+                                <ContextMenuItem
                                     onClick={() => {
                                         state.renaming.set(file)
                                     }}
                                 >
                                     Rename
-                                </ContextMenu.Item>
+                                </ContextMenuItem>
                             ) : null}
-                        </ContextMenu.Content>
-                    </ContextMenu.Root>
+                        </ContextMenuContent>
+                    </ContextMenu>
                 </FolderContentExplorer.GridItem>
             ))}
         </Virtualizer.Grid>

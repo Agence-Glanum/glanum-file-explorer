@@ -1,32 +1,40 @@
 import { Row, createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table"
-import React from "react"
+import React, { useMemo } from "react"
 import { File } from "../../../types/file"
 import { useVirtualizer } from "@tanstack/react-virtual"
 import { observer } from "@legendapp/state/react"
 import { fetchFiles, state } from "../../../stores/mix"
 import { FileExplorerReturnType } from "../../../hooks/use-file-explorer"
 import { Skeleton } from "../../skeleton/skeleton"
+import MixFileTableActionDelete from "./mix-file-table-action-delete/mix-file-table-action-delete"
 
 interface MixFileTableProps extends FileExplorerReturnType {}
 
-const MixFileTable = observer(function MixFileTable({currentFolderContent, updateFolder}: MixFileTableProps) {
+const MixFileTable = observer(function MixFileTable({currentFolderContent, updateFolder, removeFile}: MixFileTableProps) {
 
     const tableContainerRef = React.useRef<HTMLDivElement>(null)
   
     const sorting = state.sorting.get()
     const isLoading = state.filesState.loading.get()
     const totalCount = state.filesState.meta.total.get()
+    const url = state.url.get()
 
     const columnHelper = createColumnHelper<File>()
 
-    const columns = [
+    const columns = useMemo(() => [
         columnHelper.accessor('name', {
           cell: info => info.getValue(),
         }),
         columnHelper.accessor('updated_at', {
           cell: info => info.getValue(),
         }),
-    ]
+        columnHelper.accessor('id', {
+          header: () => null,
+          cell: info => (
+            <MixFileTableActionDelete file={info.row.original} url={url} removeFile={removeFile} />
+          ),
+        }),
+    ], [url])
   
     const totalFetched = currentFolderContent.length
     const nextUrl = state.filesState.links.next.get()
@@ -38,6 +46,7 @@ const MixFileTable = observer(function MixFileTable({currentFolderContent, updat
           if (
             scrollHeight - scrollTop - clientHeight < 300 &&
             !isLoading &&
+            nextUrl &&
             totalFetched < totalCount
           ) {
             fetchFiles({
@@ -81,10 +90,10 @@ const MixFileTable = observer(function MixFileTable({currentFolderContent, updat
       virtualRows.length > 0
         ? getTotalSize() - (virtualRows?.[virtualRows.length - 1]?.end || 0)
         : 0
-  
+
     return (
       <>
-        <div className="mt-1 space-y-2">
+        <div className="space-y-2">
           {isLoading && currentFolderContent.length === 0? [...Array(15).keys()].map(() => (
             <Skeleton className="h-[50px] w-full"/>
           )): null}
@@ -93,9 +102,10 @@ const MixFileTable = observer(function MixFileTable({currentFolderContent, updat
           className="h-[500px] overflow-auto"
           onScroll={e => fetchMoreOnBottomReached(e.target as HTMLDivElement)}
           ref={tableContainerRef}
+          style={{ overflowAnchor: 'none' }}
         >
-          <table className="table-fixed w-full">
-            <thead className="sticky top-0">
+          <table className="table-fixed w-full border-collapse">
+            <thead className="sticky top-0 m-0">
               {table.getHeaderGroups().map(headerGroup => (
                 <tr key={headerGroup.id} className="bg-gray-50 border-y border-gray-200">
                   {headerGroup.headers.map(header => {

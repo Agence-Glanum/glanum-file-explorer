@@ -28,6 +28,7 @@ interface DataState {
 
 interface State {
     url: string
+    layout: 'grid'|'list'
     renaming: File|null
     sorting: SortingState,
     foldersState: DataState,
@@ -36,6 +37,7 @@ interface State {
 
 export const state = observable<State>({
     url: "",
+    layout: 'list',
     renaming: null,
     sorting: [],
     foldersState: {loading: false},
@@ -102,4 +104,18 @@ export async function renameFile({url, onSuccess, name}: {name: string} & fetchP
     const data = await response.json()
 
     onSuccess(data.data as FolderFiles)
+}
+
+export async function deleteFile({url, onSuccess}: {url: string, onSuccess?: () => void}) {
+
+    const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        }
+    })
+
+    await response.json()
+
+    onSuccess && onSuccess()
 }
