@@ -3,11 +3,11 @@ import * as FolderExplorer from "../components/tree-explorer/tree-explorer";
 import * as FolderContentExplorer from "../components/folder-content-explorer/folder-content-explorer";
 import * as Dropzone from "../components/dropzone/dropzone";
 import { useFileExplorerLegacy } from "../hooks/use-file-explorer-legacy";
-import * as ContextMenu from "../components/context-menu/context-menu";
 import { ArchiveIcon, CrumpledPaperIcon, DashboardIcon, FileIcon, InputIcon, ListBulletIcon } from "@radix-ui/react-icons";
 import * as TogglePrimitive from "@radix-ui/react-toggle"
 import { useState } from "react";
 import { generateFolderData } from "../data/data";
+import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuShortcut, ContextMenuTrigger } from "../components/context-menu/context-menu";
 export const Page: React.FC = () => {
 
   const [layout, setLayout] = useState<'list'|'grid'>('grid')
@@ -41,8 +41,8 @@ export const Page: React.FC = () => {
               className="h-[32px]"
             >
               <FolderExplorer.DepthIndicator depth={folder.depth} offset={7}/>
-              <ContextMenu.Root>
-                <ContextMenu.Trigger asChild>
+              <ContextMenu>
+                <ContextMenuTrigger asChild>
                   <FolderExplorer.Content
                     onDoubleClick={() => {
                       updateFolder(generateFolderData(folder.id))
@@ -65,18 +65,18 @@ export const Page: React.FC = () => {
                     <ArchiveIcon className="ml-1" />
                     <span className="ml-2 max-w-[75px] truncate">{folder.name}</span>
                   </FolderExplorer.Content>  
-                </ContextMenu.Trigger>
-                  <ContextMenu.Content>
-                    <ContextMenu.Item
+                </ContextMenuTrigger>
+                  <ContextMenuContent>
+                    <ContextMenuItem
                       onClick={() => {
                         updateFolder(generateFolderData(folder.id))
                         openFolderFromTree(folder)
                       }}
                     >
                       {isFolderOpen(folder) ? "Close" : "Open"}
-                    </ContextMenu.Item>
+                    </ContextMenuItem>
                     {isFolderOpen(folder) ? (
-                      <ContextMenu.Item
+                      <ContextMenuItem
                         onClick={() => {
                           const newfolder = createTempFolder(folder)
 
@@ -88,16 +88,16 @@ export const Page: React.FC = () => {
                             updateFile({
                               ...newfolder, 
                               sync: true,
-                              meta: {...newfolder.meta, oldId: newfolder.id}
+                              metadata: {...newfolder.metadata, oldId: newfolder.id}
                             })
                           }, 3000)
                         }}
                       >
                         Create folder
-                      </ContextMenu.Item>
+                      </ContextMenuItem>
                     ) : null}
-                  </ContextMenu.Content>
-              </ContextMenu.Root>
+                  </ContextMenuContent>
+              </ContextMenu>
             </FolderExplorer.Item>
           ))}
       </Virtualizer.List>
@@ -140,8 +140,8 @@ export const Page: React.FC = () => {
             Upload
           </Dropzone.Overlay>
           {layout === 'grid' ? (
-            <ContextMenu.Root>
-              <ContextMenu.Trigger>
+            <ContextMenu>
+              <ContextMenuTrigger>
                 <Virtualizer.Grid
                   estimeHeight={115}
                   estimateWidth={150}
@@ -161,8 +161,8 @@ export const Page: React.FC = () => {
                       }}
                       className="py-1 px-2"
                     >
-                      <ContextMenu.Root>
-                        <ContextMenu.Trigger asChild>
+                      <ContextMenu>
+                        <ContextMenuTrigger asChild>
                           <div title={file.name} className="py-2 px-4 flex flex-col justify-center items-center border whitespace-nowrap rounded cursor-pointer ">
                             {file.type === "folder" ? (
                               <ArchiveIcon className="h-16 w-16 text-gray-600" />
@@ -190,10 +190,10 @@ export const Page: React.FC = () => {
                             )}
                           
                           </div>
-                        </ContextMenu.Trigger>
-                          <ContextMenu.Content>
+                        </ContextMenuTrigger>
+                          <ContextMenuContent>
                             {file.type === "folder" ? (
-                              <ContextMenu.Item
+                              <ContextMenuItem
                                 onClick={(e) => {
                                   e.stopPropagation()
                                   updateFolder(generateFolderData(file.id))
@@ -201,25 +201,25 @@ export const Page: React.FC = () => {
                                 }}
                               >
                                 Open
-                              </ContextMenu.Item>
+                              </ContextMenuItem>
                             ): null}
-                              <ContextMenu.Item
+                              <ContextMenuItem
                               onClick={() => {
                                 startRenaming(file)
                               }}
                             >
                               Rename
-                            </ContextMenu.Item>
-                          </ContextMenu.Content>
-                      </ContextMenu.Root>
+                            </ContextMenuItem>
+                          </ContextMenuContent>
+                      </ContextMenu>
                     </FolderContentExplorer.GridItem>
                   ))}
                 </Virtualizer.Grid>
-              </ContextMenu.Trigger>
-              <ContextMenu.Content className="w-48">
+              </ContextMenuTrigger>
+              <ContextMenuContent className="w-48">
                 {currentFolder !== null ? (
                   <>
-                    <ContextMenu.Item inset
+                    <ContextMenuItem inset
                       onClick={() => {
                         if (!currentFolder) {
                           return
@@ -234,28 +234,28 @@ export const Page: React.FC = () => {
                           updateFile({
                             ...folder, 
                             sync: true,
-                            meta: {...folder.meta, oldId: folder.id}
+                            metadata: {...folder.metadata, oldId: folder.id}
                           })
                         }, 3000)
                       }}
                     >
                       Create folder
-                      <ContextMenu.Shortcut>⌘F</ContextMenu.Shortcut>
-                    </ContextMenu.Item>
-                    <ContextMenu.Item inset>
+                      <ContextMenuShortcut>⌘F</ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuItem inset>
                       Reload
-                      <ContextMenu.Shortcut>⌘R</ContextMenu.Shortcut>
-                    </ContextMenu.Item>
-                    <ContextMenu.Separator />
+                      <ContextMenuShortcut>⌘R</ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuSeparator />
                   </>
                 ) : null} 
-                <ContextMenu.CheckboxItem checked>
+                <ContextMenuCheckboxItem checked>
                   Show grid
-                  <ContextMenu.Shortcut>⌘⇧B</ContextMenu.Shortcut>
-                </ContextMenu.CheckboxItem>
-                <ContextMenu.CheckboxItem>Show list</ContextMenu.CheckboxItem>
-              </ContextMenu.Content>
-            </ContextMenu.Root>
+                  <ContextMenuShortcut>⌘⇧B</ContextMenuShortcut>
+                </ContextMenuCheckboxItem>
+                <ContextMenuCheckboxItem>Show list</ContextMenuCheckboxItem>
+              </ContextMenuContent>
+            </ContextMenu>
           ) : null}
           {layout === 'list' ? (
             <Virtualizer.List className="h-full w-[750px]" estimateSize={50}>
@@ -334,7 +334,7 @@ export const Page: React.FC = () => {
                   {selectedFiles[0].name}
                 </h3>
                 <p className="text-sm text-gray-300">
-                  {selectedFiles[0].meta?.parentDirId}
+                  {selectedFiles[0].metadata?.parentDirId}
                 </p>
               </div>
             ): null}
