@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
-import { produce } from "immer"
+import { create } from 'mutative';
 import { v4 } from "uuid"
-import { FolderFiles, File, Folder } from "../types/file"
+import { FolderFiles, File } from "../types/file"
 import { convertToInternalFiles } from "../utils/convert-to-internal-files"
 
 type Props = {
@@ -15,7 +15,7 @@ export function useFileExplorer({defaultFolder}: Props) {
 
     useEffect(() => {
         if (defaultFolder) {
-            setStore(produce((store) => {
+            setStore(create((store) => {
                 store.push(convertToInternalFiles(defaultFolder))
             }))
             setCurrentFolderId(defaultFolder.id)
@@ -29,7 +29,7 @@ export function useFileExplorer({defaultFolder}: Props) {
     }
 
     const updateFolder = async (updatedFolder: FolderFiles, {refresh = false, partial = false}) => {
-        setStore(produce((store) => {
+        setStore(create((store) => {
             const folderIndex = store.findIndex((folder) => folder.id === updatedFolder.id)
 
             if (folderIndex !== -1) {
@@ -43,7 +43,7 @@ export function useFileExplorer({defaultFolder}: Props) {
                     store[folderIndex].files.push(...convertToInternalFiles(updatedFolder).files)
                 }
 
-                return 
+                return
             }
 
             const childIndex = store.findIndex((folder) => folder.id === updatedFolder.metadata?.parentDirId)
@@ -82,7 +82,7 @@ export function useFileExplorer({defaultFolder}: Props) {
 
                 const files = folder.files.map((f) => {
                     const foundFile = f.id === id
-    
+
                     if (!foundFile) {
                         return f
                     }
@@ -114,7 +114,7 @@ export function useFileExplorer({defaultFolder}: Props) {
             if (foundFile) {
                 return state.filter((stateFile)  => stateFile.id !== file.id)
             }
-            
+
             return [...state, file]
         })
     }
@@ -147,21 +147,21 @@ export function useFileExplorer({defaultFolder}: Props) {
             updated_at: null
         }
 
-        setStore(produce((draft) => {
+        setStore(create((draft) => {
             const foundFolder = draft.find((folder) => folder.id === parentFolder.id)
 
             if (!foundFolder) {
                 return
             }
 
-            foundFolder.files.splice(0, 0, newFile)     
+            foundFolder.files.splice(0, 0, newFile)
         }))
 
 
         return newFile
     }
 
-    const createTempFolder = (parentFolder: string, defaultFolder?: Partial<File>) => {        
+    const createTempFolder = (parentFolder: string, defaultFolder?: Partial<File>) => {
         return createTempFile(
             parentFolder, {
             name:  "New Folder",
