@@ -1,5 +1,5 @@
-import { produce } from "immer"
-import { useCallback, useMemo, useState } from "react"
+import { useState } from "react"
+import { create } from 'mutative';
 import { v4 } from "uuid"
 
 type File = {
@@ -50,7 +50,7 @@ export function searchTree(file: InternalFile, fileId: string): InternalFile|nul
     if(file.id === fileId){
          return file
     }
-    
+
     if (file.children){
          let i
          let result = null
@@ -68,8 +68,8 @@ export function searchTree(file: InternalFile, fileId: string): InternalFile|nul
 type TreeInternalFile = InternalFile & {depth: number|undefined, parent: Array<string>}
 
 const traverse = (
-    folder: Array<InternalFile>, 
-    depth?: undefined|number, 
+    folder: Array<InternalFile>,
+    depth?: undefined|number,
     parent?: undefined|Array<string>
 ): Array<TreeInternalFile> => {
 
@@ -88,7 +88,7 @@ const traverse = (
     return folder.reduce<Array<TreeInternalFile>>(function(result,next){
         result.push({...next, depth, parent: [...parent as Array<string>]});
         if(next.children){
-          result = result.concat(traverse(next.children.filter((file) => file.type === "folder"), depth, parent));  
+          result = result.concat(traverse(next.children.filter((file) => file.type === "folder"), depth, parent));
         }
         return result;
       },[])
@@ -133,7 +133,7 @@ export function useFileExplorerLegacy({defaultFiles}: Props) {
     }
 
     const openFolderFromTree = (folder: TreeInternalFile) => {
-        setOpenFolders(produce((draft) => {
+        setOpenFolders(create((draft) => {
             const index = draft.indexOf(folder.id)
             if (index === -1) {
                 draft.push(folder.id)
@@ -146,7 +146,7 @@ export function useFileExplorerLegacy({defaultFiles}: Props) {
     }
 
     const openFolder = (folder: InternalFile) => {
-        setOpenFolders(produce((draft) => {
+        setOpenFolders(create((draft) => {
             const index = draft.indexOf(folder.id)
 
             if(index === -1) {
@@ -174,7 +174,7 @@ export function useFileExplorerLegacy({defaultFiles}: Props) {
 
     const updateFolder = (updatedFiles: FolderFiles) => {
         if (updatedFiles && updatedFiles.files.length > 0) {
-            setFiles(produce((draft) => {
+            setFiles(create((draft) => {
                 const parentFolder = searchInFiles(updatedFiles.id, draft)
 
                 if (parentFolder && parentFolder.children?.length === 0) {
@@ -185,7 +185,7 @@ export function useFileExplorerLegacy({defaultFiles}: Props) {
     }
 
     const updateFile = (file: InternalFile) => {
-        setFiles(produce((draft) => {
+        setFiles(create((draft) => {
             const id = file.metadata?.oldId ?? file.id
 
             const foundFile = searchInFiles(id, draft)
@@ -221,7 +221,7 @@ export function useFileExplorerLegacy({defaultFiles}: Props) {
             children: []
         }
 
-        setFiles(produce((draft) => {
+        setFiles(create((draft) => {
             const folder = searchInFiles(parentFolder.id, draft)
 
             if (folder && folder.children) {
@@ -233,8 +233,8 @@ export function useFileExplorerLegacy({defaultFiles}: Props) {
     }
 
     const createTempFile = (
-        parentFolder: InternalFile, 
-        defaultName: string = "New file", 
+        parentFolder: InternalFile,
+        defaultName: string = "New file",
         type: string = "file"
     ) => {
         if (parentFolder.type !== "folder") {
@@ -257,7 +257,7 @@ export function useFileExplorerLegacy({defaultFiles}: Props) {
             children: []
         }
 
-        setFiles(produce((draft) => {
+        setFiles(create((draft) => {
             const folder = searchInFiles(parentFolder.id, draft)
 
             if (folder && folder.children) {
@@ -301,7 +301,7 @@ export function useFileExplorerLegacy({defaultFiles}: Props) {
 
     const currentFolder = searchInFiles(currentFolderId ?? null)
 
-    const currentFolderContent = currentFolder ? (currentFolder as InternalFile).children ?? [] : [] 
+    const currentFolderContent = currentFolder ? (currentFolder as InternalFile).children ?? [] : []
 
     return  {
         files,
