@@ -9,19 +9,9 @@ type Props = {
 }
 
 export function useFileExplorer({defaultFolder}: Props) {
-    const [store, setStore] = useState<Array<FolderFiles>>([])
+    const [store, setStore] = useState<FolderFiles[]>([])
     const [currentFolderId, setCurrentFolderId] = useState<string|null>(null)
-    const [selectedFiles, setSelectedFiles] = useState<Array<File>>([])
-
-    useEffect(() => {
-        if (defaultFolder) {
-            setStore(create((store) => {
-                store.push(convertToInternalFiles(defaultFolder))
-            }))
-            setCurrentFolderId(defaultFolder.id)
-        }
-    }, [])
-
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([])
 
     const focusFolder = async (folderId: string) => {
         setSelectedFiles([])
@@ -101,6 +91,13 @@ export function useFileExplorer({defaultFolder}: Props) {
         })
     }
 
+    useEffect(() => {
+        if (defaultFolder) {
+            updateFolder(defaultFolder, {})
+            setCurrentFolderId(defaultFolder.id)
+        }
+    }, [])
+
     const selectFile = (file: File|File[]) => {
         const files = Array.isArray(file) ? file : [file]
 
@@ -164,10 +161,10 @@ export function useFileExplorer({defaultFolder}: Props) {
     const createTempFolder = (parentFolder: string, defaultFolder?: Partial<File>) => {
         return createTempFile(
             parentFolder, {
-            name:  "New Folder",
-            ...(defaultFolder ?? {}),
-            type: 'folder'
-         })
+                name:  "New Folder",
+                ...(defaultFolder ?? {}),
+                type: 'folder'
+            })
     }
 
     const isFileSelected = (fileId: string) => {
@@ -195,8 +192,8 @@ export function useFileExplorer({defaultFolder}: Props) {
         })
     }
 
-    const folderExists = (folder: File) => {
-        return store.find((f) => f.id === folder.id) !== undefined
+    const folderExists = (folder: string) => {
+        return store.find((f) => f.id === folder) !== undefined
     }
 
     const hasManySelectedFiles = selectedFiles.length > 1

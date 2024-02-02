@@ -16,7 +16,7 @@ const MixFolderGrid = observer(function MixFolderGrid({
     currentFolderContent,
     updateFile,
     currentFolder,
-    isFileSelected, 
+    isFileSelected,
     hasManySelectedFiles,
     updateFolder,
     updateFiles,
@@ -42,7 +42,7 @@ const MixFolderGrid = observer(function MixFolderGrid({
                 onSuccess: () => {},
                 name: value
             })
-            
+
             updateFile({...folder,  name: value})
         }
     }
@@ -65,18 +65,18 @@ const MixFolderGrid = observer(function MixFolderGrid({
 
     const onOpenFolder = (folder: File) => {
 
-        if (folderExists(folder)) {
+        if (folderExists(folder.id)) {
             focusFolder(folder.id)
             return
         }
 
         fetchFiles({
-            url: `${url}/folders/${folder.id}/files?filter[type]=file`, 
+            url: `${url}/folders/${folder.id}/files?filter[type]=file`,
             onSuccess: (data) => updateFiles(data, {})
         })
-      
+
         fetchFolders({
-            url: `${url}/folders/${folder.id}/files?filter[type]=folder`, 
+            url: `${url}/folders/${folder.id}/files?filter[type]=folder`,
             onSuccess: (data) => updateFolder(data, {})
         })
     }
@@ -124,7 +124,7 @@ const MixFolderGrid = observer(function MixFolderGrid({
                                     ): (
                                         <span className="text-xl font-semibold">{folder.name}</span>
                                     )}
-                                    
+
                                     <DotsVerticalIcon className="w-6 h-6 text-gray-300"/>
                                 </div>
                             </div>
